@@ -11,13 +11,21 @@ const API = {
     return !CONFIG.API_URL || CONFIG.API_URL.includes('YOUR_GOOGLE_APPS_SCRIPT');
   },
 
-  async request(action, data = {}, method) {
+  async request(action, data = {}, options = {}) {
+    const { method, silent = false, useCache = true } = options;
+
     if (this.isDemoMode()) {
       console.warn('API_URL chưa được cấu hình. Sử dụng dữ liệu demo.');
       return this._demoResponse(action, data);
     }
 
-    Utils.showLoading(true);
+    const isCacheable = useCache && this.GET_ACTIONS.has(action);
+    if (isCacheable) {
+      const cached = AppStore.get(action, data);
+      if (cached !== null) return cached;
+    }
+
+    if (!silent) Utils.showLoading(true);
     try {
       const token = Auth.getToken();
       const payload = { action, ...data };
@@ -59,12 +67,29 @@ const API = {
         if (result.code === 'UNAUTHORIZED') Auth.logout();
         throw new Error(result.message || 'Lỗi không xác định');
       }
+
+      if (isCacheable) {
+        AppStore.set(action, data, result.data);
+      }
+      this._invalidateAfter(action);
+
       return result.data;
     } catch (err) {
       Utils.showToast(err.message, 'danger');
       throw err;
     } finally {
-      Utils.showLoading(false);
+      if (!silent) Utils.showLoading(false);
+    }
+  },
+
+  _invalidateAfter(action) {
+    const keys = CACHE_INVALIDATION[action];
+    if (action === 'logout') {
+      AppStore.clear();
+      return;
+    }
+    if (keys?.length) {
+      AppStore.invalidateMany(keys);
     }
   },
 

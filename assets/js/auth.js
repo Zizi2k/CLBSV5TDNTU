@@ -36,14 +36,17 @@ const Auth = {
   async login(identifier, password) {
     const data = await API.login(identifier, password);
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+    AppStore.clear();
     this.updateNavbar();
     return data.user;
   },
 
   logout() {
+    API.logout().catch(() => {});
     localStorage.removeItem(this.STORAGE_KEY);
+    AppStore.clear();
     this.updateNavbar();
-    Router.navigate('home');
+    Router.go('home');
     Utils.showToast('Đã đăng xuất', 'info');
   },
 
@@ -78,9 +81,9 @@ const Auth = {
 
   redirectAfterLogin(user) {
     switch (user.role) {
-      case 'admin': Router.navigate('admin'); break;
-      case 'executive': Router.navigate('manage'); break;
-      default: Router.navigate('my-profile'); break;
+      case 'admin': Router.go('admin'); break;
+      case 'executive': Router.go('manage'); break;
+      default: Router.go('my-profile'); break;
     }
   }
 };

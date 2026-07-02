@@ -1,6 +1,6 @@
 Pages.register = async function(container) {
   if (Auth.isLoggedIn()) {
-    Router.navigate('my-profile');
+    Router.go('my-profile');
     return;
   }
 
@@ -170,7 +170,7 @@ Pages.register = async function(container) {
     try {
       await API.register(data);
       Utils.showToast('Đăng ký thành công! Vui lòng chờ phê duyệt.', 'success');
-      Router.navigate('login');
+      Router.go('login');
     } catch (err) {
       // handled
     }

@@ -6,6 +6,32 @@ const Utils = {
     document.getElementById('loadingOverlay').classList.toggle('d-none', !show);
   },
 
+  showPageSkeleton(container) {
+    container.innerHTML = `
+      <div class="page-skeleton page-enter">
+        <div class="container py-4">
+          <div class="placeholder-glow mb-4">
+            <span class="placeholder rounded" style="display:block;width:40%;height:2rem"></span>
+          </div>
+          <div class="row g-3 mb-4">
+            ${[1,2,3,4].map(() => `
+              <div class="col-6 col-md-3">
+                <div class="card p-3 placeholder-glow">
+                  <span class="placeholder col-8 rounded mb-2" style="height:0.8rem"></span>
+                  <span class="placeholder col-5 rounded" style="height:1.8rem"></span>
+                </div>
+              </div>`).join('')}
+          </div>
+          <div class="card p-4 placeholder-glow">
+            <span class="placeholder col-12 rounded mb-3" style="height:2.5rem"></span>
+            <span class="placeholder col-12 rounded mb-3" style="height:2.5rem"></span>
+            <span class="placeholder col-10 rounded" style="height:2.5rem"></span>
+          </div>
+        </div>
+      </div>`;
+    return container.firstElementChild;
+  },
+
   showToast(message, type = 'info') {
     const icons = { success: 'check-circle', danger: 'exclamation-circle', warning: 'exclamation-triangle', info: 'info-circle' };
     const container = document.getElementById('toastContainer');

@@ -1,12 +1,13 @@
 /**
- * Khởi tạo ứng dụng
+ * Khởi tạo SPA — shell cố định, nội dung tải qua AJAX
  */
 document.addEventListener('DOMContentLoaded', () => {
   const verEl = document.getElementById('appVersion');
   if (verEl && CONFIG.APP_VERSION) {
-    verEl.textContent = `v${CONFIG.APP_VERSION}`;
+    verEl.textContent = `v${CONFIG.APP_VERSION} · SPA`;
   }
 
+  initSpaNavigation();
   Auth.updateNavbar();
 
   Router.register('home', Pages.home);
@@ -24,3 +25,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
   Router.init();
 });
+
+/**
+ * Bắt mọi link nội bộ (#) — không reload trang
+ */
+function initSpaNavigation() {
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href^="#"]');
+    if (!link || link.hasAttribute('data-bs-toggle')) return;
+
+    const href = link.getAttribute('href');
+    if (!href || href === '#') return;
+
+    e.preventDefault();
+    const target = href.slice(1);
+    if (!target) return;
+
+    if (window.location.hash === href) {
+      Router.navigate(target, {}, { force: true });
+    } else {
+      window.location.hash = target;
+    }
+  });
+
+  // Ngăn form GET submit gây reload (nếu có)
+  document.addEventListener('submit', (e) => {
+    const form = e.target;
+    if (form.tagName === 'FORM' && !form.hasAttribute('data-ajax')) {
+      const method = (form.getAttribute('method') || 'get').toLowerCase();
+      if (method === 'get' && !form.hasAttribute('action')) {
+        e.preventDefault();
+      }
+    }
+  });
+}

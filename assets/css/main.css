@@ -287,6 +287,21 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* SPA skeleton loading */
+.page-skeleton .placeholder {
+  background-color: #e2e8f0;
+}
+.page-skeleton .card {
+  border: none;
+  box-shadow: var(--shadow);
+}
+
+/* SPA shell — navbar/footer cố định, chỉ main thay đổi */
+#appContent {
+  min-height: 60vh;
+  transition: opacity 0.15s ease;
+}
+
 /* Section titles */
 .section-title {
   font-weight: 700;
