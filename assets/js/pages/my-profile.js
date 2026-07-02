@@ -219,6 +219,14 @@ function ensureProfileModals() {
             <div class="modal-body">
               <div class="row g-3">
                 <div class="col-md-6">
+                  <label class="form-label">Ngày tham gia CLB</label>
+                  <input type="date" class="form-control" name="joinDate">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Danh hiệu</label>
+                  <input type="text" class="form-control" name="titles" placeholder="VD: Thành viên tích cực, SV5T xuất sắc">
+                </div>
+                <div class="col-md-6">
                   <label class="form-label">Số điện thoại</label>
                   <input type="tel" class="form-control" name="phone">
                 </div>
@@ -298,9 +306,11 @@ function openEditProfileModal(member) {
   const form = document.getElementById('editProfileForm');
   if (!form) return;
   form.reset();
-  ['phone', 'address', 'facebook', 'zalo', 'hobbies', 'skills', 'quote', 'bio'].forEach(field => {
+  ['phone', 'address', 'facebook', 'zalo', 'hobbies', 'skills', 'quote', 'bio', 'titles'].forEach(field => {
     const el = form.elements[field];
     if (el) el.value = member[field] || '';
   });
+  const joinDateEl = form.elements.joinDate;
+  if (joinDateEl) joinDateEl.value = Utils.toInputDate(member.joinDate);
   new bootstrap.Modal(document.getElementById('editProfileModal')).show();
 }

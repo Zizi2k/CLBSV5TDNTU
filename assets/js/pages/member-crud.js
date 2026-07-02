@@ -101,6 +101,14 @@ const MemberCRUD = {
                     <input type="text" class="form-control" name="cohort" placeholder="VD: K22">
                   </div>
                   <div class="col-md-4">
+                    <label class="form-label">Ngày tham gia CLB</label>
+                    <input type="date" class="form-control" name="joinDate">
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Danh hiệu</label>
+                    <input type="text" class="form-control" name="titles" placeholder="VD: Thành viên tích cực">
+                  </div>
+                  <div class="col-md-4">
                     <label class="form-label">Chức vụ CLB</label>
                     <input type="text" class="form-control" name="role" placeholder="VD: Thành viên, Ủy viên">
                   </div>
@@ -236,10 +244,12 @@ const MemberCRUD = {
       document.getElementById('memberPasswordGroup').classList.add('d-none');
       document.getElementById('memberUserRoleGroup').classList.add('d-none');
 
-      ['name', 'mssv', 'email', 'phone', 'school', 'faculty', 'className', 'cohort', 'role', 'bio'].forEach(field => {
+      ['name', 'mssv', 'email', 'phone', 'school', 'faculty', 'className', 'cohort', 'role', 'bio', 'titles'].forEach(field => {
         const el = form.elements[field];
         if (el) el.value = member[field] || '';
       });
+      const joinDateEl = form.elements.joinDate;
+      if (joinDateEl) joinDateEl.value = Utils.toInputDate(member.joinDate);
 
       const avatarSection = document.getElementById('memberAvatarSection');
       const avatarPreview = document.getElementById('memberAvatarPreview');

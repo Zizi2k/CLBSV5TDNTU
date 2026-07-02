@@ -269,7 +269,9 @@ const DemoData = {
       className: data.className ?? store[idx].className,
       cohort: data.cohort ?? store[idx].cohort,
       role: data.role ?? store[idx].role,
-      bio: data.bio ?? store[idx].bio
+      bio: data.bio ?? store[idx].bio,
+      titles: data.titles ?? store[idx].titles,
+      joinDate: data.joinDate ?? store[idx].joinDate
     });
     return { message: 'Cập nhật thành công' };
   },
@@ -438,7 +440,18 @@ const DemoData = {
 
   checkIn() { return { message: 'Điểm danh thành công' }; },
 
-  updateProfile(data) { return { message: 'Cập nhật thành công' }; },
+  updateProfile(data) {
+    const user = typeof Auth !== 'undefined' ? Auth.getUser() : null;
+    const id = user?.memberId || user?.id || 'M001';
+    const store = DemoData._getMembersStore();
+    const member = store.find(m => m.id === id);
+    if (member) {
+      ['phone', 'address', 'facebook', 'zalo', 'hobbies', 'skills', 'quote', 'bio', 'titles', 'joinDate'].forEach(f => {
+        if (data[f] !== undefined) member[f] = data[f];
+      });
+    }
+    return { message: 'Cập nhật thành công' };
+  },
 
   changePassword() { return { message: 'Đã đổi mật khẩu thành công' }; },
 

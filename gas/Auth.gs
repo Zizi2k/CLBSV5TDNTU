@@ -167,9 +167,10 @@ function getProfile(user) {
 }
 
 function updateProfile(user, payload) {
-  const allowed = ['phone', 'address', 'facebook', 'zalo', 'hobbies', 'skills', 'quote', 'bio'];
+  const allowed = ['phone', 'address', 'facebook', 'zalo', 'hobbies', 'skills', 'quote', 'bio', 'titles', 'joinDate'];
   const updates = {};
   allowed.forEach(f => { if (payload[f] !== undefined) updates[f] = payload[f]; });
+  if (updates.joinDate) updates.joinDate = formatDate(updates.joinDate);
   updateRow(SHEET_NAMES.MEMBERS, user.memberId, updates);
   logAudit('UPDATE_PROFILE', user.memberId, null);
   return { message: 'Cập nhật thành công' };

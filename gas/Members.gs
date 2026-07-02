@@ -109,9 +109,10 @@ function addMember(payload) {
 
 function updateMember(id, payload) {
   const allowed = ['name', 'mssv', 'school', 'faculty', 'className', 'email', 'phone', 'birthday', 'address',
-    'facebook', 'zalo', 'hobbies', 'skills', 'quote', 'bio', 'role', 'cohort', 'titles'];
+    'facebook', 'zalo', 'hobbies', 'skills', 'quote', 'bio', 'role', 'cohort', 'titles', 'joinDate'];
   const updates = {};
   allowed.forEach(f => { if (payload[f] !== undefined) updates[f] = payload[f]; });
+  if (updates.joinDate) updates.joinDate = formatDate(updates.joinDate);
   updateRow(SHEET_NAMES.MEMBERS, id, updates);
 
   const members = getSheetData(SHEET_NAMES.MEMBERS);
