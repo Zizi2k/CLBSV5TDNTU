@@ -96,7 +96,8 @@ function routeAction(action, payload) {
     getDashboard: () => requireRole(payload._user, ['admin', 'executive']) || getDashboard(),
     getAuditLog: () => requireRole(payload._user, ['admin']) || getAuditLog(),
     getSettings: () => getSettings(),
-    uploadAvatar: () => uploadAvatar(payload.base64, payload.filename, payload._user),
+    uploadAvatar: () => uploadAvatar(payload.base64, payload.filename, payload._user, payload.memberId),
+    uploadClubLogo: () => requireRole(payload._user, ['admin']) || uploadClubLogo(payload.base64, payload.filename, payload._user),
 
     // Setup helper
     initializeSheets: () => initializeSheets()

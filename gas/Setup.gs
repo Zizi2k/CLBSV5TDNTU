@@ -82,6 +82,7 @@ function seedData(ss) {
 
   appendRowToSheet(ss, 'Settings', { key: 'club_name', value: 'CLB Sinh viên 5 Tốt Thành phố Đồng Nai', description: 'Tên CLB' });
   appendRowToSheet(ss, 'Settings', { key: 'contact_email', value: 'clbsv5t.dongnai@gmail.com', description: 'Email liên hệ' });
+  appendRowToSheet(ss, 'Settings', { key: 'club_logo', value: '', description: 'Logo CLB (URL Google Drive)' });
 
   const today = new Date();
   const fmt = d => Utilities.formatDate(d, 'Asia/Ho_Chi_Minh', 'yyyy-MM-dd');

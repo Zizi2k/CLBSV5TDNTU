@@ -65,5 +65,6 @@ const CACHE_INVALIDATION = {
   checkIn: [],
   updateProfile: ['getMember'],
   changePassword: [],
-  uploadAvatar: ['getMember']
+  uploadAvatar: ['getMember', 'getMembers'],
+  uploadClubLogo: ['getSettings']
 };

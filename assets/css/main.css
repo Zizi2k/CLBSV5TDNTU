@@ -180,6 +180,32 @@ body {
   object-fit: cover;
   margin-bottom: 1rem;
 }
+.avatar-upload-wrap {
+  position: relative;
+  display: inline-block;
+}
+.avatar-change-btn {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+}
+.club-logo-preview {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  border: 2px dashed #dee2e6;
+  border-radius: 12px;
+  padding: 8px;
+  background: #f8f9fa;
+}
 .profile-section {
   background: white;
   border-radius: var(--radius);

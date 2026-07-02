@@ -9,7 +9,12 @@ Pages.myProfile = async function(container) {
   container.innerHTML = `
     <div class="profile-header">
       <div class="container">
-        <img src="${Utils.avatarUrl(member.avatar, member.name)}" alt="" class="profile-avatar">
+        <div class="avatar-upload-wrap">
+          <img src="${Utils.avatarUrl(member.avatar, member.name)}" alt="" class="profile-avatar" id="profileAvatarImg">
+          <button type="button" class="btn btn-warning avatar-change-btn" id="btnChangeAvatar" title="Đổi ảnh đại diện">
+            <i class="bi bi-camera-fill"></i>
+          </button>
+        </div>
         <h2 class="mb-1">${Utils.escapeHtml(member.name)}</h2>
         <p class="lead mb-0">${Utils.escapeHtml(member.role)}</p>
       </div>
@@ -112,6 +117,15 @@ Pages.myProfile = async function(container) {
   ensureProfileModals();
 
   document.getElementById('btnEditProfile')?.addEventListener('click', () => openEditProfileModal(member));
+  document.getElementById('btnChangeAvatar')?.addEventListener('click', async () => {
+    try {
+      await Utils.uploadMemberAvatar(memberId, (result) => {
+        const img = document.getElementById('profileAvatarImg');
+        if (img) img.src = Utils.avatarUrl(result.url, member.name);
+        Utils.showToast('Đã cập nhật ảnh đại diện', 'success');
+      });
+    } catch (err) { /* handled */ }
+  });
   document.getElementById('btnChangePassword')?.addEventListener('click', () => {
     new bootstrap.Modal(document.getElementById('changePasswordModal')).show();
   });

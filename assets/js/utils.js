@@ -115,6 +115,74 @@ const Utils = {
     return url || this.defaultAvatar(name);
   },
 
+  DEFAULT_CLUB_LOGO: 'assets/img/logo.svg',
+
+  applyClubLogos(url) {
+    const src = url || this.DEFAULT_CLUB_LOGO;
+    document.querySelectorAll('.club-logo').forEach(img => { img.src = src; });
+    const favicon = document.querySelector('link[rel="icon"]');
+    if (favicon && url) favicon.href = url;
+    if (url) {
+      try { localStorage.setItem('club_logo', url); } catch { /* ignore */ }
+    }
+  },
+
+  async loadClubBranding() {
+    const cached = localStorage.getItem('club_logo');
+    if (cached) this.applyClubLogos(cached);
+    try {
+      const settings = await API.getSettings();
+      if (settings?.club_logo) this.applyClubLogos(settings.club_logo);
+    } catch { /* ignore */ }
+  },
+
+  fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  },
+
+  async pickImageFile(maxMb = 5) {
+    return new Promise((resolve) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/jpeg,image/png,image/webp';
+      input.onchange = () => {
+        const file = input.files?.[0];
+        if (!file) { resolve(null); return; }
+        if (file.size > maxMb * 1024 * 1024) {
+          this.showToast(`Ảnh không được quá ${maxMb}MB`, 'danger');
+          resolve(null);
+          return;
+        }
+        resolve(file);
+      };
+      input.click();
+    });
+  },
+
+  async uploadMemberAvatar(memberId, onSuccess) {
+    const file = await this.pickImageFile();
+    if (!file) return null;
+    const base64 = await this.fileToBase64(file);
+    const result = await API.uploadAvatar(base64, file.name, memberId);
+    if (onSuccess) onSuccess(result);
+    return result;
+  },
+
+  async uploadClubLogoFile(onSuccess) {
+    const file = await this.pickImageFile();
+    if (!file) return null;
+    const base64 = await this.fileToBase64(file);
+    const result = await API.uploadClubLogo(base64, file.name);
+    this.applyClubLogos(result.url);
+    if (onSuccess) onSuccess(result);
+    return result;
+  },
+
   debounce(fn, delay = 300) {
     let timer;
     return (...args) => {

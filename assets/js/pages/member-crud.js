@@ -58,6 +58,15 @@ const MemberCRUD = {
               </div>
               <div class="modal-body">
                 <input type="hidden" id="memberId">
+                <div class="text-center mb-3 d-none" id="memberAvatarSection">
+                  <div class="avatar-upload-wrap">
+                    <img id="memberAvatarPreview" src="" alt="" class="rounded-circle border" width="80" height="80" style="object-fit:cover">
+                    <button type="button" class="btn btn-sm btn-primary avatar-change-btn" id="btnMemberAvatar" title="Đổi ảnh">
+                      <i class="bi bi-camera"></i>
+                    </button>
+                  </div>
+                  <div class="small text-muted mt-2">Ảnh đại diện thành viên</div>
+                </div>
                 <div class="row g-3">
                   <div class="col-md-6">
                     <label class="form-label">Họ và tên <span class="text-danger">*</span></label>
@@ -124,6 +133,7 @@ const MemberCRUD = {
     `);
 
     document.getElementById('memberForm').addEventListener('submit', (e) => this.handleSubmit(e));
+    document.getElementById('btnMemberAvatar')?.addEventListener('click', () => this.handleAvatarChange());
   },
 
   bindEvents(container, reloadFn) {
@@ -200,7 +210,20 @@ const MemberCRUD = {
     document.getElementById('memberModalTitle').textContent = 'Thêm thành viên';
     document.getElementById('memberPasswordGroup').classList.remove('d-none');
     document.getElementById('memberUserRoleGroup').classList.remove('d-none');
+    document.getElementById('memberAvatarSection')?.classList.add('d-none');
     new bootstrap.Modal(document.getElementById(this.modalId)).show();
+  },
+
+  async handleAvatarChange() {
+    const id = document.getElementById('memberId').value;
+    if (!id) return;
+    try {
+      await Utils.uploadMemberAvatar(id, (result) => {
+        const preview = document.getElementById('memberAvatarPreview');
+        if (preview) preview.src = result.url;
+        Utils.showToast('Đã cập nhật ảnh đại diện', 'success');
+      });
+    } catch (err) { /* handled */ }
   },
 
   async openEdit(id) {
@@ -217,6 +240,13 @@ const MemberCRUD = {
         const el = form.elements[field];
         if (el) el.value = member[field] || '';
       });
+
+      const avatarSection = document.getElementById('memberAvatarSection');
+      const avatarPreview = document.getElementById('memberAvatarPreview');
+      if (avatarSection && avatarPreview) {
+        avatarSection.classList.remove('d-none');
+        avatarPreview.src = Utils.avatarUrl(member.avatar, member.name);
+      }
 
       new bootstrap.Modal(document.getElementById(this.modalId)).show();
     } catch (err) { /* handled */ }

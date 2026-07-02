@@ -45,6 +45,7 @@ Pages.admin = async function(container) {
               <a class="nav-link" href="#" data-tab="announcements"><i class="bi bi-megaphone me-2"></i>Thông báo</a>
               <a class="nav-link" href="#" data-tab="executive"><i class="bi bi-diagram-3 me-2"></i>Ban Chủ nhiệm</a>
               <a class="nav-link" href="#" data-tab="audit"><i class="bi bi-journal-text me-2"></i>Nhật ký</a>
+              <a class="nav-link" href="#" data-tab="settings"><i class="bi bi-gear me-2"></i>Cài đặt</a>
             </nav>
           </div>
         </div>
@@ -65,6 +66,7 @@ Pages.admin = async function(container) {
       case 'announcements': await AnnouncementCRUD.loadInto(content); break;
       case 'executive': content.innerHTML = await renderAdminExecutive(); break;
       case 'audit': content.innerHTML = await renderAdminAudit(); break;
+      case 'settings': content.innerHTML = await renderAdminSettings(); bindAdminSettings(); break;
     }
   }
 
@@ -119,4 +121,46 @@ async function renderAdminAudit() {
       </div>
     </div>
   `;
+}
+
+async function renderAdminSettings() {
+  let settings = {};
+  try { settings = await API.getSettings(); } catch { settings = {}; }
+  const logoUrl = settings.club_logo || Utils.DEFAULT_CLUB_LOGO;
+  return `
+    <div class="card">
+      <div class="card-header bg-white"><h5 class="mb-0">Cài đặt CLB</h5></div>
+      <div class="card-body">
+        <div class="row g-4 align-items-center">
+          <div class="col-md-4 text-center">
+            <img src="${Utils.escapeHtml(logoUrl)}" alt="Logo CLB" class="club-logo-preview" id="adminClubLogoPreview">
+          </div>
+          <div class="col-md-8">
+            <h6>Logo CLB</h6>
+            <p class="text-muted small mb-3">Logo hiển thị trên thanh điều hướng, chân trang và trang đăng nhập. Khuyến nghị ảnh vuông PNG/JPG, tối đa 5MB.</p>
+            <button type="button" class="btn btn-primary" id="btnChangeClubLogo">
+              <i class="bi bi-image me-1"></i>Đổi logo CLB
+            </button>
+          </div>
+        </div>
+        <hr>
+        <div class="small text-muted">
+          <strong>Tên CLB:</strong> ${Utils.escapeHtml(settings.club_name || CONFIG.CLUB_NAME)}<br>
+          <strong>Email liên hệ:</strong> ${Utils.escapeHtml(settings.contact_email || 'clbsv5t.dongnai@gmail.com')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function bindAdminSettings() {
+  document.getElementById('btnChangeClubLogo')?.addEventListener('click', async () => {
+    try {
+      await Utils.uploadClubLogoFile((result) => {
+        const preview = document.getElementById('adminClubLogoPreview');
+        if (preview) preview.src = result.url;
+        Utils.showToast('Đã cập nhật logo CLB', 'success');
+      });
+    } catch (err) { /* handled */ }
+  });
 }

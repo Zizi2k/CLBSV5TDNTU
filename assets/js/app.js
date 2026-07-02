@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initSpaNavigation();
   Auth.updateNavbar();
+  Utils.loadClubBranding();
 
   Router.register('home', Pages.home);
   Router.register('login', Pages.login);

@@ -136,21 +136,45 @@ function logAudit(action, details, token) {
   }
 }
 
-function uploadAvatar(base64, filename, user) {
+function extractDriveFileId(value) {
+  if (!value) return '';
+  const str = String(value);
+  if (!str.includes('http') && !str.includes('/')) return str;
+  const match = str.match(/[-\w]{25,}/);
+  return match ? match[0] : '';
+}
+
+function trashDriveFile(value) {
+  const fileId = extractDriveFileId(value);
+  if (!fileId) return;
+  try {
+    DriveApp.getFileById(fileId).setTrashed(true);
+  } catch (e) { /* ignore */ }
+}
+
+function uploadAvatar(base64, filename, user, targetMemberId) {
   if (!base64) throw new Error('Không có dữ liệu ảnh');
   const folderId = PropertiesService.getScriptProperties().getProperty('AVATAR_FOLDER_ID');
   if (!folderId) throw new Error('Chưa cấu hình AVATAR_FOLDER_ID');
 
-  const blob = Utilities.newBlob(Utilities.base64Decode(base64), 'image/jpeg', filename || 'avatar.jpg');
+  let memberId = user.memberId || user.id;
+  if (targetMemberId && targetMemberId !== memberId) {
+    if (user.role !== 'admin' && user.role !== 'executive') {
+      throw new Error('Bạn không có quyền đổi ảnh thành viên khác');
+    }
+    memberId = targetMemberId;
+  }
+
+  const members = getSheetData(SHEET_NAMES.MEMBERS);
+  const existing = members.find(m => m.id === memberId);
+  if (!existing) throw new Error('Không tìm thấy thành viên');
+
+  const mimeType = (filename || '').toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+  const blob = Utilities.newBlob(Utilities.base64Decode(base64), mimeType, filename || 'avatar.jpg');
   const folder = DriveApp.getFolderById(folderId);
 
-  const memberId = user.memberId || user.id;
-  const existing = getSheetData(SHEET_NAMES.MEMBERS).find(m => m.id === memberId);
-  if (existing && existing.avatar) {
-    try {
-      const oldFile = DriveApp.getFileById(existing.avatar);
-      oldFile.setTrashed(true);
-    } catch (e) { /* ignore */ }
+  if (existing.avatar) {
+    trashDriveFile(existing.avatar);
   }
 
   const file = folder.createFile(blob);
@@ -159,7 +183,50 @@ function uploadAvatar(base64, filename, user) {
 
   updateRow(SHEET_NAMES.MEMBERS, memberId, { avatar: url });
   logAudit('UPLOAD_AVATAR', memberId, null);
+  return { url, memberId };
+}
+
+function uploadClubLogo(base64, filename, user) {
+  if (!base64) throw new Error('Không có dữ liệu ảnh');
+  if (!user || user.role !== 'admin') {
+    throw new Error('Chỉ Admin mới được đổi logo CLB');
+  }
+
+  const folderId = PropertiesService.getScriptProperties().getProperty('AVATAR_FOLDER_ID');
+  if (!folderId) throw new Error('Chưa cấu hình AVATAR_FOLDER_ID');
+
+  const settings = getSettings();
+  if (settings.club_logo) {
+    trashDriveFile(settings.club_logo);
+  }
+
+  const mimeType = (filename || '').toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+  const blob = Utilities.newBlob(Utilities.base64Decode(base64), mimeType, filename || 'club-logo.jpg');
+  const folder = DriveApp.getFolderById(folderId);
+  const file = folder.createFile(blob);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  const url = 'https://drive.google.com/uc?id=' + file.getId();
+
+  setSetting('club_logo', url);
+  logAudit('UPLOAD_CLUB_LOGO', url, null);
   return { url };
+}
+
+function setSetting(key, value) {
+  const sheet = getSheet(SHEET_NAMES.SETTINGS);
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  const keyIndex = headers.indexOf('key');
+  const valueIndex = headers.indexOf('value');
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][keyIndex] === key) {
+      sheet.getRange(i + 1, valueIndex + 1).setValue(value);
+      return;
+    }
+  }
+
+  appendRow(SHEET_NAMES.SETTINGS, { key: key, value: value, description: '' });
 }
 
 function getSettings() {

@@ -145,7 +145,8 @@ const API = {
   getSettings: () => API.request('getSettings'),
 
   // Upload avatar (base64)
-  uploadAvatar: (base64, filename) => API.request('uploadAvatar', { base64, filename }),
+  uploadAvatar: (base64, filename, memberId) => API.request('uploadAvatar', { base64, filename, memberId }),
+  uploadClubLogo: (base64, filename) => API.request('uploadClubLogo', { base64, filename }),
 
   // Demo data khi chưa cấu hình API
   _demoResponse(action, data) {
@@ -443,5 +444,31 @@ const DemoData = {
 
   register() {
     return { message: 'Đăng ký thành công! Vui lòng chờ Ban Chủ nhiệm phê duyệt.' };
+  },
+
+  getSettings() {
+    return {
+      club_name: CONFIG.CLUB_NAME,
+      contact_email: 'clbsv5t.dongnai@gmail.com',
+      club_logo: localStorage.getItem('club_logo') || ''
+    };
+  },
+
+  uploadAvatar({ base64, filename, memberId }) {
+    const mime = (filename || '').toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+    const url = `data:${mime};base64,${base64}`;
+    const user = typeof Auth !== 'undefined' ? Auth.getUser() : null;
+    const id = memberId || user?.memberId || user?.id || 'M001';
+    const store = DemoData._getMembersStore();
+    const member = store.find(m => m.id === id);
+    if (member) member.avatar = url;
+    return { url, memberId: id };
+  },
+
+  uploadClubLogo({ base64, filename }) {
+    const mime = (filename || '').toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+    const url = `data:${mime};base64,${base64}`;
+    localStorage.setItem('club_logo', url);
+    return { url };
   }
 };
