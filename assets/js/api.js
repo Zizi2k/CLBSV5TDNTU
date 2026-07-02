@@ -25,7 +25,13 @@ const API = {
         });
       }
 
-      const result = await response.json();
+      const text = await response.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        throw new Error('Không thể kết nối API. Kiểm tra URL Google Apps Script và quyền truy cập.');
+      }
       if (!result.success) {
         if (result.code === 'UNAUTHORIZED') Auth.logout();
         throw new Error(result.message || 'Lỗi không xác định');
@@ -94,14 +100,58 @@ const API = {
 
   // Demo data khi chưa cấu hình API
   _demoResponse(action, data) {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(DemoData[action]?.(data)), 300);
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        try {
+          const fn = DemoData[action];
+          if (!fn) {
+            resolve({ message: 'Thao tác demo thành công' });
+            return;
+          }
+          resolve(fn(data));
+        } catch (e) {
+          reject(e);
+        }
+      }, 300);
     });
   }
 };
 
 const DemoData = {
   _activities: null,
+  _members: null,
+  _pending: null,
+  _announcements: null,
+
+  _getMembersStore() {
+    if (!this._members) {
+      this._members = [
+        { id: 'M001', name: 'Nguyễn Văn A', mssv: '2110001', role: 'Ủy viên', school: 'Đại học Công nghệ TP.HCM', faculty: 'CNTT', cohort: 'K21', avatar: '', email: 'nguyenvana@email.com', phone: '0901234567', bio: '' },
+        { id: 'M002', name: 'Trần Thị B', mssv: '2210002', role: 'Thành viên', school: 'Đại học Kinh tế', faculty: 'Quản trị', cohort: 'K22', avatar: '', email: 'tranthib@email.com', phone: '', bio: '' },
+        { id: 'M003', name: 'Lê Văn C', mssv: '2110003', role: 'Trưởng ban Sự kiện', school: 'Đại học Sư phạm', faculty: 'Văn học', cohort: 'K21', avatar: '', email: 'levanc@email.com', phone: '', bio: '' }
+      ];
+    }
+    return this._members;
+  },
+
+  _getPendingStore() {
+    if (!this._pending) {
+      this._pending = [
+        { id: 'P001', name: 'Nguyễn Thị E', mssv: '2112345', school: 'ĐH Công nghệ', email: 'e@email.com', registeredAt: '2026-06-28' }
+      ];
+    }
+    return this._pending;
+  },
+
+  _getAnnouncementsStore() {
+    if (!this._announcements) {
+      this._announcements = [
+        { id: 'N001', title: 'Thông báo tuyển thành viên mới', content: 'CLB SV5T mở đợt tuyển thành viên mới.', author: 'Ban Chủ nhiệm', createdAt: new Date(Date.now() - 7200000).toISOString(), pinned: true, important: true },
+        { id: 'N002', title: 'Thông báo họp Ban Chủ nhiệm', content: 'Cuộc họp định kỳ tháng 7.', author: 'Thư ký', createdAt: new Date(Date.now() - 86400000).toISOString(), pinned: false, important: false }
+      ];
+    }
+    return this._announcements;
+  },
 
   _getActivitiesStore() {
     if (!this._activities) {
@@ -127,34 +177,77 @@ const DemoData = {
   },
 
   getMembers() {
-    return [
-      { id: 'M001', name: 'Nguyễn Văn A', role: 'Ủy viên', school: 'Đại học Công nghệ TP.HCM', faculty: 'CNTT', cohort: 'K21', avatar: '', email: 'nguyenvana@email.com' },
-      { id: 'M002', name: 'Trần Thị B', role: 'Thành viên', school: 'Đại học Kinh tế', faculty: 'Quản trị', cohort: 'K22', avatar: '', email: 'tranthib@email.com' },
-      { id: 'M003', name: 'Lê Văn C', role: 'Trưởng ban Sự kiện', school: 'Đại học Sư phạm', faculty: 'Văn học', cohort: 'K21', avatar: '', email: 'levanc@email.com' },
-      { id: 'M004', name: 'Phạm Thị D', role: 'Thành viên', school: 'Đại học Lạc Hồng', faculty: 'Kế toán', cohort: 'K23', avatar: '', email: 'phamthid@email.com' }
-    ];
+    return DemoData._getMembersStore().map(m => ({ ...m }));
   },
 
   getMember({ id }) {
-    const members = DemoData.getMembers();
-    const m = members.find(x => x.id === id) || members[0];
+    const m = DemoData._getMembersStore().find(x => x.id === id) || DemoData._getMembersStore()[0];
     return {
       ...m,
-      phone: '0901234567',
+      phone: m.phone || '0901234567',
       birthday: '2003-05-15',
       address: 'Biên Hòa, Đồng Nai',
-      facebook: 'facebook.com/nguyenvana',
-      zalo: '0901234567',
-      hobbies: 'Đọc sách, Bóng đá, Tình nguyện',
-      skills: 'MC, Thiết kế, Lập trình',
-      quote: 'Hãy là phiên bản tốt nhất của chính mình',
-      reason: 'Muốn phát triển bản thân và cống hiến cho cộng đồng',
-      bio: 'Sinh viên năm 3 ngành CNTT, đam mê công nghệ và hoạt động xã hội.',
-      joinDate: '2024-09-01',
-      totalScore: 45,
-      titles: 'Thành viên tích cực'
+      facebook: '', zalo: '',
+      hobbies: 'Đọc sách, Bóng đá',
+      skills: 'MC, Lập trình',
+      quote: '', reason: '', bio: m.bio || '',
+      joinDate: '2024-09-01', totalScore: 45, titles: 'Thành viên tích cực'
     };
   },
+
+  addMember(data) {
+    const id = 'M' + Date.now();
+    DemoData._getMembersStore().push({
+      id, name: data.name, mssv: data.mssv || '', email: data.email,
+      role: data.role || 'Thành viên', school: data.school || '', faculty: data.faculty || '',
+      cohort: data.cohort || '', phone: data.phone || '', bio: data.bio || '', avatar: ''
+    });
+    return { id, message: 'Đã thêm thành viên' };
+  },
+
+  updateMember(data) {
+    const store = DemoData._getMembersStore();
+    const idx = store.findIndex(m => m.id === data.id);
+    if (idx === -1) throw new Error('Không tìm thấy thành viên');
+    Object.assign(store[idx], {
+      name: data.name ?? store[idx].name,
+      mssv: data.mssv ?? store[idx].mssv,
+      email: data.email ?? store[idx].email,
+      phone: data.phone ?? store[idx].phone,
+      school: data.school ?? store[idx].school,
+      faculty: data.faculty ?? store[idx].faculty,
+      className: data.className ?? store[idx].className,
+      cohort: data.cohort ?? store[idx].cohort,
+      role: data.role ?? store[idx].role,
+      bio: data.bio ?? store[idx].bio
+    });
+    return { message: 'Cập nhật thành công' };
+  },
+
+  deleteMember({ id }) {
+    let store = DemoData._getMembersStore();
+    let idx = store.findIndex(m => m.id === id);
+    if (idx !== -1) { store.splice(idx, 1); return { message: 'Đã xóa' }; }
+    store = DemoData._getPendingStore();
+    idx = store.findIndex(m => m.id === id);
+    if (idx !== -1) { store.splice(idx, 1); return { message: 'Đã xóa' }; }
+    throw new Error('Không tìm thấy thành viên');
+  },
+
+  approveMember({ id }) {
+    const pending = DemoData._getPendingStore();
+    const idx = pending.findIndex(p => p.id === id);
+    if (idx === -1) throw new Error('Không tìm thấy đơn đăng ký');
+    const p = pending.splice(idx, 1)[0];
+    DemoData._getMembersStore().push({
+      id: 'M' + Date.now(), name: p.name, mssv: p.mssv, email: p.email,
+      school: p.school, role: 'Thành viên', faculty: '', cohort: '', avatar: '', phone: '', bio: ''
+    });
+    return { message: 'Đã duyệt' };
+  },
+
+  lockMember() { return { message: 'Đã khóa tài khoản' }; },
+  resetPassword() { return { message: 'Đã reset mật khẩu' }; },
 
   getActivities() {
     return DemoData._getActivitiesStore().map(a => ({ ...a }));
@@ -211,11 +304,45 @@ const DemoData = {
   },
 
   getAnnouncements() {
-    return [
-      { id: 'N001', title: 'Thông báo tuyển thành viên mới', content: 'CLB SV5T mở đợt tuyển thành viên mới cho năm học 2025-2026. Hạn đăng ký: 30/09/2026.', author: 'Ban Chủ nhiệm', createdAt: new Date(Date.now() - 7200000).toISOString(), pinned: true, important: true },
-      { id: 'N002', title: 'Thông báo họp Ban Chủ nhiệm', content: 'Cuộc họp định kỳ tháng 7 vào lúc 19h00 ngày 10/07 tại phòng họp CLB.', author: 'Thư ký', createdAt: new Date(Date.now() - 86400000).toISOString(), pinned: false, important: false },
-      { id: 'N003', title: 'Kế hoạch hoạt động tháng 9', content: 'Tháng 9 sẽ có các hoạt động: Mùa hè xanh, Hiến máu, và Workshop kỹ năng mềm.', author: 'Ban Sự kiện', createdAt: new Date(Date.now() - 172800000).toISOString(), pinned: false, important: true }
-    ];
+    return DemoData._getAnnouncementsStore().map(a => ({ ...a }));
+  },
+
+  addAnnouncement(data) {
+    const id = 'N' + Date.now();
+    DemoData._getAnnouncementsStore().unshift({
+      id, title: data.title, content: data.content,
+      author: 'Admin', createdAt: new Date().toISOString(),
+      pinned: !!data.pinned, important: !!data.important
+    });
+    return { id, message: 'Đã đăng thông báo' };
+  },
+
+  updateAnnouncement(data) {
+    const store = DemoData._getAnnouncementsStore();
+    const item = store.find(n => n.id === data.id);
+    if (!item) throw new Error('Không tìm thấy thông báo');
+    Object.assign(item, {
+      title: data.title ?? item.title,
+      content: data.content ?? item.content,
+      pinned: data.pinned ?? item.pinned,
+      important: data.important ?? item.important
+    });
+    return { message: 'Cập nhật thành công' };
+  },
+
+  deleteAnnouncement({ id }) {
+    const store = DemoData._getAnnouncementsStore();
+    const idx = store.findIndex(n => n.id === id);
+    if (idx === -1) throw new Error('Không tìm thấy');
+    store.splice(idx, 1);
+    return { message: 'Đã ẩn' };
+  },
+
+  togglePinAnnouncement({ id }) {
+    const item = DemoData._getAnnouncementsStore().find(n => n.id === id);
+    if (!item) throw new Error('Không tìm thấy');
+    item.pinned = !item.pinned;
+    return { pinned: item.pinned };
   },
 
   getExecutiveBoard() {
@@ -242,15 +369,24 @@ const DemoData = {
   },
 
   getDashboard() {
-    return { totalMembers: 85, pendingMembers: 5, totalActivities: 12, totalAnnouncements: 8, activeMembers: 72 };
+    return {
+      totalMembers: DemoData._getMembersStore().length,
+      pendingMembers: DemoData._getPendingStore().length,
+      totalActivities: DemoData._getActivitiesStore().length,
+      totalAnnouncements: DemoData._getAnnouncementsStore().length,
+      activeMembers: DemoData._getMembersStore().length
+    };
   },
 
   getPendingMembers() {
-    return [
-      { id: 'P001', name: 'Nguyễn Thị E', mssv: '2112345', school: 'ĐH Công nghệ', email: 'e@email.com', registeredAt: '2026-06-28' },
-      { id: 'P002', name: 'Trần Văn F', mssv: '2212346', school: 'ĐH Kinh tế', email: 'f@email.com', registeredAt: '2026-06-29' }
-    ];
+    return DemoData._getPendingStore().map(p => ({ ...p }));
   },
+
+  getAuditLog() { return []; },
+
+  addScore() { return { message: 'Đã cộng điểm', total: 0 }; },
+
+  checkIn() { return { message: 'Điểm danh thành công' }; },
 
   register() {
     return { message: 'Đăng ký thành công! Vui lòng chờ Ban Chủ nhiệm phê duyệt.' };

@@ -108,11 +108,25 @@ function addMember(payload) {
 }
 
 function updateMember(id, payload) {
-  const allowed = ['name', 'school', 'faculty', 'className', 'email', 'phone', 'birthday', 'address',
+  const allowed = ['name', 'mssv', 'school', 'faculty', 'className', 'email', 'phone', 'birthday', 'address',
     'facebook', 'zalo', 'hobbies', 'skills', 'quote', 'bio', 'role', 'cohort', 'titles'];
   const updates = {};
   allowed.forEach(f => { if (payload[f] !== undefined) updates[f] = payload[f]; });
   updateRow(SHEET_NAMES.MEMBERS, id, updates);
+
+  const members = getSheetData(SHEET_NAMES.MEMBERS);
+  const member = members.find(m => m.id === id);
+  if (member && member.userId) {
+    const userUpdates = {};
+    if (payload.email !== undefined) userUpdates.email = payload.email;
+    if (payload.name !== undefined) userUpdates.name = payload.name;
+    if (payload.mssv !== undefined) userUpdates.mssv = payload.mssv;
+    if (payload.userRole !== undefined) userUpdates.role = payload.userRole;
+    if (Object.keys(userUpdates).length) {
+      updateRow(SHEET_NAMES.USERS, member.userId, userUpdates);
+    }
+  }
+
   logAudit('UPDATE_MEMBER', id, null);
   return { message: 'Cập nhật thành công' };
 }
