@@ -357,6 +357,72 @@ const Utils = {
     link.click();
   },
 
+  hexToArgb(hex) {
+    const h = String(hex || '#0B84FF').replace('#', '');
+    return h.length === 6 ? `FF${h.toUpperCase()}` : 'FF0B84FF';
+  },
+
+  MEMBER_EXPORT_COLUMNS: [
+    { header: 'STT', key: 'stt', width: 6 },
+    { header: 'Mã TV', key: 'id', width: 14 },
+    { header: 'Họ và tên', key: 'name', width: 24 },
+    { header: 'MSSV', key: 'mssv', width: 12 },
+    { header: 'Trường', key: 'school', width: 28 },
+    { header: 'Khoa', key: 'faculty', width: 22 },
+    { header: 'Lớp', key: 'className', width: 14 },
+    { header: 'Khóa', key: 'cohort', width: 10 },
+    { header: 'Email', key: 'email', width: 26 },
+    { header: 'SĐT', key: 'phone', width: 14 },
+    { header: 'Ngày sinh', key: 'birthday', width: 12 },
+    { header: 'Địa chỉ', key: 'address', width: 32 },
+    { header: 'Vai trò', key: 'role', width: 16 },
+    { header: 'Ngày tham gia', key: 'joinDate', width: 14 },
+    { header: 'Điểm HĐ', key: 'totalScore', width: 10 },
+    { header: 'Danh hiệu', key: 'titles', width: 20 },
+    { header: 'Facebook', key: 'facebook', width: 28 },
+    { header: 'Zalo', key: 'zalo', width: 14 },
+    { header: 'Sở thích', key: 'hobbies', width: 20 },
+    { header: 'Kỹ năng', key: 'skills', width: 20 },
+    { header: 'Giới thiệu', key: 'bio', width: 30 }
+  ],
+
+  prepareMemberExportRows(members) {
+    return (members || []).map((m, i) => ({
+      stt: i + 1,
+      id: m.id || '',
+      name: m.name || '',
+      mssv: m.mssv || '',
+      school: m.school || '',
+      faculty: m.faculty || '',
+      className: m.className || '',
+      cohort: m.cohort || '',
+      email: m.email || '',
+      phone: m.phone || '',
+      birthday: m.birthday || '',
+      address: m.address || '',
+      role: m.role || '',
+      joinDate: m.joinDate || '',
+      totalScore: m.totalScore ?? '',
+      titles: m.titles || '',
+      facebook: m.facebook || '',
+      zalo: m.zalo || '',
+      hobbies: m.hobbies || '',
+      skills: m.skills || '',
+      bio: m.bio || ''
+    }));
+  },
+
+  async exportMembersExcel(members, filename = 'danh-sach-thanh-vien.xlsx') {
+    const rows = this.prepareMemberExportRows(members);
+    await this.exportToExcel(rows, filename, {
+      sheetName: 'Thành viên',
+      title: `${CONFIG.CLUB_SHORT} — Danh sách thành viên`,
+      subtitle: `Xuất ngày: ${new Date().toLocaleString('vi-VN')} · Tổng: ${rows.length} thành viên`,
+      columns: this.MEMBER_EXPORT_COLUMNS,
+      freezeHeader: true
+    });
+  },
+
   parseCheckInQrPayload(text) {
     if (!text) return null;
     const str = String(text).trim();
@@ -438,57 +504,114 @@ const Utils = {
     }
 
     const workbook = new ExcelJS.Workbook();
-    const ws = workbook.addWorksheet(options.sheetName || 'Sheet1');
+    workbook.creator = CONFIG.CLUB_SHORT || 'CLB SV5T DNTU';
+    workbook.created = new Date();
+
+    const ws = workbook.addWorksheet(options.sheetName || 'Sheet1', {
+      views: [{ showGridLines: true }]
+    });
+
     const columns = options.columns;
     const headers = columns ? columns.map(c => c.header) : Object.keys(data[0]);
     const keys = columns ? columns.map(c => c.key) : Object.keys(data[0]);
+    const colCount = headers.length;
 
-    const headerRow = ws.addRow(headers);
-    headerRow.height = 22;
+    const primaryArgb = this.hexToArgb(this.primaryColor());
+    const primaryDarkArgb = this.hexToArgb(this.primaryColorDark());
+    const borderArgb = 'FFE2E8F0';
+    const headerBorderArgb = primaryDarkArgb;
+
+    const styleTitleRow = (row, text, fontSize, colorArgb, height) => {
+      const cell = ws.getCell(row, 1);
+      cell.value = text;
+      ws.mergeCells(row, 1, row, colCount);
+      cell.font = { bold: true, size: fontSize, color: { argb: colorArgb } };
+      cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+      ws.getRow(row).height = height;
+    };
+
+    let rowIndex = 1;
+    if (options.title) {
+      styleTitleRow(rowIndex, options.title, 14, primaryDarkArgb, 32);
+      rowIndex++;
+    }
+    if (options.subtitle) {
+      styleTitleRow(rowIndex, options.subtitle, 10, 'FF64748B', 22);
+      rowIndex++;
+    }
+
+    const headerRowIndex = rowIndex;
+    const headerRow = ws.getRow(rowIndex);
+    headers.forEach((h, i) => { headerRow.getCell(i + 1).value = h; });
+    headerRow.height = 26;
     headerRow.eachCell(cell => {
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0B84FF' } };
-      cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: primaryArgb } };
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11, name: 'Segoe UI' };
       cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
       cell.border = {
-        top: { style: 'thin', color: { argb: 'FF1E40AF' } },
-        left: { style: 'thin', color: { argb: 'FF1E40AF' } },
-        bottom: { style: 'thin', color: { argb: 'FF1E40AF' } },
-        right: { style: 'thin', color: { argb: 'FF1E40AF' } }
+        top: { style: 'thin', color: { argb: headerBorderArgb } },
+        left: { style: 'thin', color: { argb: headerBorderArgb } },
+        bottom: { style: 'medium', color: { argb: headerBorderArgb } },
+        right: { style: 'thin', color: { argb: headerBorderArgb } }
       };
     });
+    rowIndex++;
 
-    data.forEach((row, rowIndex) => {
+    data.forEach((row, dataIndex) => {
       const values = keys.map(k => row[k] ?? '');
-      const dataRow = ws.addRow(values);
-      const fillArgb = rowIndex % 2 === 0 ? 'FFF8FAFC' : 'FFFFFFFF';
+      const dataRow = ws.getRow(rowIndex);
+      values.forEach((v, i) => { dataRow.getCell(i + 1).value = v; });
+      const fillArgb = dataIndex % 2 === 0 ? 'FFF8FAFC' : 'FFFFFFFF';
       dataRow.eachCell(cell => {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fillArgb } };
+        cell.font = { size: 10, name: 'Segoe UI', color: { argb: 'FF1E293B' } };
         cell.alignment = { vertical: 'middle', wrapText: true };
         cell.border = {
-          top: { style: 'thin', color: { argb: 'FFE2E8F0' } },
-          left: { style: 'thin', color: { argb: 'FFE2E8F0' } },
-          bottom: { style: 'thin', color: { argb: 'FFE2E8F0' } },
-          right: { style: 'thin', color: { argb: 'FFE2E8F0' } }
+          top: { style: 'thin', color: { argb: borderArgb } },
+          left: { style: 'thin', color: { argb: borderArgb } },
+          bottom: { style: 'thin', color: { argb: borderArgb } },
+          right: { style: 'thin', color: { argb: borderArgb } }
         };
       });
+
+      let maxLines = 1;
+      values.forEach((val, colIdx) => {
+        const text = String(val ?? '');
+        const colWidth = columns?.[colIdx]?.width || ws.getColumn(colIdx + 1).width || 12;
+        const charsPerLine = Math.max(Math.floor(colWidth * 1.15), 8);
+        const lines = Math.max(1, Math.ceil(text.length / charsPerLine));
+        if (lines > maxLines) maxLines = lines;
+      });
+      dataRow.height = Math.min(Math.max(maxLines * 16, 20), 72);
+      rowIndex++;
     });
 
     ws.columns.forEach((col, i) => {
+      const preset = columns?.[i]?.width;
+      if (preset) {
+        col.width = preset;
+        return;
+      }
       let maxLen = String(headers[i] || '').length;
       data.forEach(row => {
         const len = String(row[keys[i]] ?? '').length;
         if (len > maxLen) maxLen = len;
       });
-      col.width = Math.min(Math.max(maxLen + 3, 12), 55);
+      col.width = Math.min(Math.max(maxLen + 3, 10), 50);
     });
 
-    if (options.title) {
-      ws.insertRow(1, [options.title]);
-      ws.mergeCells(1, 1, 1, headers.length);
-      const titleCell = ws.getCell(1, 1);
-      titleCell.font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
-      titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
-      ws.getRow(1).height = 28;
+    ws.autoFilter = {
+      from: { row: headerRowIndex, column: 1 },
+      to: { row: headerRowIndex, column: colCount }
+    };
+
+    if (options.freezeHeader !== false) {
+      ws.views = [{
+        state: 'frozen',
+        ySplit: headerRowIndex,
+        activeCell: `A${headerRowIndex + 1}`,
+        showGridLines: true
+      }];
     }
 
     const buffer = await workbook.xlsx.writeBuffer();

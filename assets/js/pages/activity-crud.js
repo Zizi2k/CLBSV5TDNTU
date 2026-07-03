@@ -375,18 +375,20 @@ const ActivityCRUD = {
       await Utils.exportToExcel(data.rows, `diem-danh-${act.id}.xlsx`, {
         sheetName: 'Điểm danh',
         title: `${CONFIG.CLUB_SHORT} — Điểm danh: ${act.name}`,
+        subtitle: `Xuất ngày: ${new Date().toLocaleString('vi-VN')} · ${data.rows.length} bản ghi`,
         columns: [
-          { header: 'STT', key: 'stt' },
-          { header: 'Mã TV', key: 'memberId' },
-          { header: 'Họ tên', key: 'name' },
-          { header: 'MSSV', key: 'mssv' },
-          { header: 'Trường', key: 'school' },
-          { header: 'Khoa', key: 'faculty' },
-          { header: 'SĐT', key: 'phone' },
-          { header: 'Thời gian', key: 'checkedInAt' },
-          { header: 'Hình thức', key: 'method' },
-          { header: 'Minh chứng', key: 'proofImage' }
-        ]
+          { header: 'STT', key: 'stt', width: 6 },
+          { header: 'Mã TV', key: 'memberId', width: 14 },
+          { header: 'Họ tên', key: 'name', width: 24 },
+          { header: 'MSSV', key: 'mssv', width: 12 },
+          { header: 'Trường', key: 'school', width: 28 },
+          { header: 'Khoa', key: 'faculty', width: 22 },
+          { header: 'SĐT', key: 'phone', width: 14 },
+          { header: 'Thời gian', key: 'checkedInAt', width: 18 },
+          { header: 'Hình thức', key: 'method', width: 12 },
+          { header: 'Minh chứng', key: 'proofImage', width: 30 }
+        ],
+        freezeHeader: true
       });
       Utils.showToast('Đã xuất file Excel', 'success');
     } catch (err) { /* handled */ }

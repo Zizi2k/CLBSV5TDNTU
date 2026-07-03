@@ -168,8 +168,10 @@ const MemberCRUD = {
       if (e.target.closest('#exportAllMembers')) {
         e.preventDefault();
         const members = await API.getMembers();
-        Utils.exportToCSV(members, 'thanh-vien-sv5t.csv');
-        Utils.showToast('Đã xuất file', 'success');
+        try {
+          await Utils.exportMembersExcel(members, 'thanh-vien-sv5t.xlsx');
+          Utils.showToast('Đã xuất file Excel', 'success');
+        } catch { /* handled */ }
         return;
       }
 

@@ -94,8 +94,10 @@ Pages.members = async function(container) {
     document.getElementById(id).addEventListener('change', filterMembers);
   });
 
-  document.getElementById('exportMembers')?.addEventListener('click', () => {
-    Utils.exportToCSV(allMembers, 'danh-sach-thanh-vien.csv');
-    Utils.showToast('Đã xuất file Excel', 'success');
+  document.getElementById('exportMembers')?.addEventListener('click', async () => {
+    try {
+      await Utils.exportMembersExcel(allMembers);
+      Utils.showToast('Đã xuất file Excel', 'success');
+    } catch { /* handled */ }
   });
 };
