@@ -4,7 +4,7 @@
  */
 const CONFIG = {
   APP_VERSION: '2.5.0',
-  API_URL: 'https://script.google.com/macros/s/AKfycbxYYUIMoXe3SG2wQky6-tQAEQ3T5ofeaQ8XZvb_Jkir16n3dYyLFfOZN7CjRI46F7kR4w/exec',
+  API_URL: 'https://script.google.com/macros/s/AKfycbz_IN2p8GfVgbrUwMUC-VnRe5JAvpauMULHe7oRpeWpmxfEm-YVj7Zq_muBGX4YB51lEQ/exec',
   CLUB_NAME: 'CLB SV5T DNTU',
   CLUB_SHORT: 'CLB SV5T DNTU',
   CLUB_TAGLINE: 'Nơi kết nối – Phát triển – Cống hiến',
