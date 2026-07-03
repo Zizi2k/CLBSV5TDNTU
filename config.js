@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Cấu hình hệ thống CLB SV5T
  * Thay API_URL bằng URL Web App sau khi deploy Google Apps Script
  */

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Cache & state SPA — giảm gọi API trùng lặp
  */
 const AppStore = {
