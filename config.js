@@ -1,14 +1,21 @@
 /**
- * Cấu hình hệ thống CLB SV5T
+ * Cấu hình hệ thống CLB SV5T DNTU
  * Thay API_URL bằng URL Web App sau khi deploy Google Apps Script
  */
 const CONFIG = {
-  APP_VERSION: '2.4.1',
-  API_URL: 'https://script.google.com/macros/s/AKfycbwWXhD7yrVWRgoGyX2XGJWxe_3T0xUUdyU0U4lQfypgPyt-Nu6IZt17NsgerMDByN7Zhw/exec',
-  CLUB_NAME: 'CLB Sinh viên 5 Tốt Thành phố Đồng Nai',
-  CLUB_SHORT: 'CLB SV5T Đồng Nai',
+  APP_VERSION: '2.5.0',
+  API_URL: 'https://script.google.com/macros/s/AKfycbxYYUIMoXe3SG2wQky6-tQAEQ3T5ofeaQ8XZvb_Jkir16n3dYyLFfOZN7CjRI46F7kR4w/exec',
+  CLUB_NAME: 'CLB SV5T DNTU',
+  CLUB_SHORT: 'CLB SV5T DNTU',
+  CLUB_TAGLINE: 'Nơi kết nối – Phát triển – Cống hiến',
+  CLUB_ADDRESS: 'Phường Trảng Dài, Thành phố Đồng Nai',
+  CONTACT_EMAIL: 'clbsv5t.dongnai@gmail.com',
+  FACEBOOK_URL: 'https://www.facebook.com/share/1AJGDLFM6D/',
+  FACEBOOK_LABEL: 'CLB SV5T DNTU',
   COLORS: {
-    primary: '#2563EB',
+    primary: '#0B84FF',
+    primaryDark: '#0066DD',
+    primaryLight: '#4DC3FF',
     accent: '#FACC15',
     white: '#FFFFFF'
   },

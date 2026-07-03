@@ -232,7 +232,7 @@ const DemoData = {
   _getAnnouncementsStore() {
     if (!this._announcements) {
       this._announcements = [
-        { id: 'N001', title: 'Thông báo tuyển thành viên mới', content: 'CLB SV5T mở đợt tuyển thành viên mới.', author: 'Ban Chủ nhiệm', createdAt: new Date(Date.now() - 7200000).toISOString(), pinned: true, important: true },
+        { id: 'N001', title: 'Thông báo tuyển thành viên mới', content: 'CLB SV5T DNTU mở đợt tuyển thành viên mới.', author: 'Ban Chủ nhiệm', createdAt: new Date(Date.now() - 7200000).toISOString(), pinned: true, important: true },
         { id: 'N002', title: 'Thông báo họp Ban Chủ nhiệm', content: 'Cuộc họp định kỳ tháng 7.', author: 'Thư ký', createdAt: new Date(Date.now() - 86400000).toISOString(), pinned: false, important: false }
       ];
     }
@@ -272,7 +272,7 @@ const DemoData = {
       ...m,
       phone: m.phone || '0901234567',
       birthday: '2003-05-15',
-      address: 'Biên Hòa, Đồng Nai',
+      address: CONFIG.CLUB_ADDRESS,
       facebook: '', zalo: '',
       hobbies: 'Đọc sách, Bóng đá',
       skills: 'MC, Lập trình',
@@ -626,7 +626,7 @@ const DemoData = {
   getSettings() {
     return {
       club_name: CONFIG.CLUB_NAME,
-      contact_email: 'clbsv5t.dongnai@gmail.com',
+      contact_email: CONFIG.CONTACT_EMAIL,
       club_logo: localStorage.getItem('club_logo') || ''
     };
   },

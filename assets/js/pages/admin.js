@@ -146,7 +146,7 @@ async function renderAdminSettings() {
         <hr>
         <div class="small text-muted">
           <strong>Tên CLB:</strong> ${Utils.escapeHtml(settings.club_name || CONFIG.CLUB_NAME)}<br>
-          <strong>Email liên hệ:</strong> ${Utils.escapeHtml(settings.contact_email || 'clbsv5t.dongnai@gmail.com')}
+          <strong>Email liên hệ:</strong> ${Utils.escapeHtml(settings.contact_email || CONFIG.CONTACT_EMAIL)}
         </div>
       </div>
     </div>

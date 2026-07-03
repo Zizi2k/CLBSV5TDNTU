@@ -9,7 +9,7 @@ Pages.executiveBoard = async function(container) {
   container.innerHTML = `
     <div class="container py-4">
       <h2 class="section-title text-center">Ban Chủ nhiệm CLB</h2>
-      <p class="text-center text-muted mb-5">Đội ngũ lãnh đạo CLB Sinh viên 5 Tốt Thành phố Đồng Nai</p>
+      <p class="text-center text-muted mb-5">Đội ngũ lãnh đạo ${CONFIG.CLUB_NAME}</p>
 
       ${chairman.length ? `
         <div class="row justify-content-center mb-4">

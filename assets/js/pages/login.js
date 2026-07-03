@@ -12,7 +12,7 @@ Pages.login = async function(container) {
             <div class="text-center mb-4">
               <img src="assets/img/logo.svg" alt="Logo" width="64" height="64" class="club-logo">
               <h3 class="mt-3">Đăng nhập</h3>
-              <p class="text-muted">Đăng nhập vào hệ thống CLB SV5T</p>
+              <p class="text-muted">Đăng nhập vào hệ thống ${CONFIG.CLUB_SHORT}</p>
             </div>
             <form id="loginForm">
               <div class="mb-3">

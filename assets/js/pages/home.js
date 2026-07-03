@@ -16,7 +16,7 @@ Pages.home = async function(container) {
     <section class="hero-banner">
       <div class="container text-center position-relative">
         <h1>Chào mừng đến với ${CONFIG.CLUB_NAME}</h1>
-        <p class="lead mt-3">Nơi kết nối – Phát triển – Cống hiến</p>
+        <p class="lead mt-3">${CONFIG.CLUB_TAGLINE}</p>
         <div class="mt-4 d-flex gap-3 justify-content-center flex-wrap">
           ${!Auth.isLoggedIn() ? `
             <a href="#login" class="btn btn-warning btn-lg px-4"><i class="bi bi-box-arrow-in-right me-2"></i>Đăng nhập</a>

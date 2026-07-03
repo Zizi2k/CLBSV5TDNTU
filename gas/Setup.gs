@@ -28,7 +28,7 @@ const SHEET_SCHEMA = {
 };
 
 const DEFAULT_SETTINGS = [
-  { key: 'club_name', value: 'CLB Sinh viên 5 Tốt Thành phố Đồng Nai', description: 'Tên CLB' },
+  { key: 'club_name', value: 'CLB SV5T DNTU', description: 'Tên CLB' },
   { key: 'contact_email', value: 'clbsv5t.dongnai@gmail.com', description: 'Email liên hệ' },
   { key: 'club_logo', value: '', description: 'Logo CLB (URL Google Drive)' }
 ];
@@ -94,11 +94,11 @@ function initializeSheets() {
     );
   }
 
-  const ss = SpreadsheetApp.create('CLB SV5T - Database');
+  const ss = SpreadsheetApp.create('CLB SV5T DNTU - Database');
   const ssId = ss.getId();
   props.setProperty('SPREADSHEET_ID', ssId);
 
-  const folder = DriveApp.createFolder('CLB SV5T - Avatars');
+  const folder = DriveApp.createFolder('CLB SV5T DNTU - Avatars');
   props.setProperty('AVATAR_FOLDER_ID', folder.getId());
 
   const defaultSheet = ss.getSheets()[0];
@@ -133,7 +133,7 @@ function applyHeaderRow(sheet, headers) {
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
   sheet.getRange(1, 1, 1, headers.length)
     .setFontWeight('bold')
-    .setBackground('#2563EB')
+    .setBackground('#0B84FF')
     .setFontColor('#FFFFFF');
   sheet.setFrozenRows(1);
 }
@@ -158,7 +158,7 @@ function addMissingColumnsToSheet(sheet, requiredHeaders) {
   });
   sheet.getRange(1, startCol, 1, missing.length)
     .setFontWeight('bold')
-    .setBackground('#2563EB')
+    .setBackground('#0B84FF')
     .setFontColor('#FFFFFF');
 
   return missing;
@@ -209,7 +209,7 @@ function seedData(ss) {
   appendRowToSheet(ss, 'Members', {
     id: adminMemberId, userId: adminId, name: 'Quản trị viên', mssv: 'admin',
     school: 'CLB SV5T', faculty: 'Ban Chủ nhiệm', className: '', email: 'admin@sv5t.vn',
-    phone: '0900000000', birthday: '', address: 'Đồng Nai', avatar: '',
+    phone: '0900000000', birthday: '', address: 'Phường Trảng Dài, Thành phố Đồng Nai', avatar: '',
     facebook: '', zalo: '', hobbies: '', skills: 'Quản trị', quote: '',
     reason: '', bio: 'Quản trị viên hệ thống', role: 'Admin', cohort: '',
     status: 'active', joinDate: formatDate(now()), totalScore: 0, titles: ''
@@ -240,7 +240,7 @@ function seedData(ss) {
 
   appendRowToSheet(ss, 'Announcements', {
     id: 'N001', title: 'Thông báo tuyển thành viên mới',
-    content: 'CLB SV5T mở đợt tuyển thành viên mới. Hạn đăng ký: 30/09/2026.',
+    content: 'CLB SV5T DNTU mở đợt tuyển thành viên mới. Hạn đăng ký: 30/09/2026.',
     authorId: adminId, authorName: 'Ban Chủ nhiệm', createdAt: formatDateTime(now()),
     pinned: true, important: true, hidden: false
   });

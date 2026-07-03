@@ -93,7 +93,7 @@ const ActivityCRUD = {
                   </div>
                   <div class="col-12">
                     <label class="form-label">Địa điểm</label>
-                    <input type="text" class="form-control" name="location" id="activityLocation" placeholder="VD: Trường ĐH Công nghệ, Biên Hòa">
+                    <input type="text" class="form-control" name="location" id="activityLocation" placeholder="VD: Khuôn viên trường, Phường Trảng Dài">
                   </div>
                   <div class="col-12">
                     <label class="form-label">Mô tả</label>
@@ -374,7 +374,7 @@ const ActivityCRUD = {
       const act = data.activity;
       await Utils.exportToExcel(data.rows, `diem-danh-${act.id}.xlsx`, {
         sheetName: 'Điểm danh',
-        title: `CLB SV5T — Điểm danh: ${act.name}`,
+        title: `${CONFIG.CLUB_SHORT} — Điểm danh: ${act.name}`,
         columns: [
           { header: 'STT', key: 'stt' },
           { header: 'Mã TV', key: 'memberId' },

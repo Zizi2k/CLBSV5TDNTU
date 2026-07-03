@@ -2,6 +2,8 @@
  * Khởi tạo SPA — shell cố định, nội dung tải qua AJAX
  */
 document.addEventListener('DOMContentLoaded', () => {
+  applySiteBranding();
+
   const verEl = document.getElementById('appVersion');
   if (verEl && CONFIG.APP_VERSION) {
     verEl.textContent = `v${CONFIG.APP_VERSION} · SPA`;
@@ -27,6 +29,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
   Router.init();
 });
+
+function applySiteBranding() {
+  if (typeof CONFIG === 'undefined') return;
+
+  const { CLUB_NAME, CLUB_SHORT, CLUB_TAGLINE, CLUB_ADDRESS, CONTACT_EMAIL, FACEBOOK_URL, FACEBOOK_LABEL, COLORS } = CONFIG;
+
+  if (COLORS) {
+    if (COLORS.primary) document.documentElement.style.setProperty('--primary', COLORS.primary);
+    if (COLORS.primaryDark) document.documentElement.style.setProperty('--primary-dark', COLORS.primaryDark);
+    if (COLORS.primaryLight) document.documentElement.style.setProperty('--primary-light', COLORS.primaryLight);
+  }
+
+  document.title = CLUB_SHORT;
+
+  const metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc) metaDesc.content = `${CLUB_NAME} - Hệ thống quản lý thành viên và hoạt động`;
+
+  const setText = (id, text) => {
+    const el = document.getElementById(id);
+    if (el && text) el.textContent = text;
+  };
+
+  setText('navbarBrandText', CLUB_SHORT);
+  setText('footerClubName', CLUB_SHORT);
+  setText('footerTagline', CLUB_TAGLINE);
+  setText('footerCopyright', CLUB_NAME);
+
+  const footerEmail = document.getElementById('footerEmail');
+  if (footerEmail && CONTACT_EMAIL) {
+    footerEmail.innerHTML = `<i class="bi bi-envelope me-2"></i><a href="mailto:${CONTACT_EMAIL}" class="text-secondary text-decoration-none">${CONTACT_EMAIL}</a>`;
+  }
+
+  const footerFacebook = document.getElementById('footerFacebook');
+  if (footerFacebook && FACEBOOK_URL) {
+    footerFacebook.innerHTML = `<i class="bi bi-facebook me-2"></i><a href="${FACEBOOK_URL}" class="text-secondary text-decoration-none" target="_blank" rel="noopener">${FACEBOOK_LABEL || CLUB_SHORT}</a>`;
+  }
+
+  const footerAddress = document.getElementById('footerAddress');
+  if (footerAddress && CLUB_ADDRESS) {
+    footerAddress.innerHTML = `<i class="bi bi-geo-alt me-2"></i>${CLUB_ADDRESS}`;
+  }
+}
 
 /**
  * Bắt mọi link nội bộ (#) — không reload trang

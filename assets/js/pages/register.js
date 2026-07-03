@@ -8,7 +8,7 @@ Pages.register = async function(container) {
     <div class="container py-4">
       <div class="text-center mb-4">
         <h2>Đăng ký thành viên</h2>
-        <p class="text-muted">Điền đầy đủ thông tin để đăng ký tham gia CLB SV5T</p>
+        <p class="text-muted">Điền đầy đủ thông tin để đăng ký tham gia ${CONFIG.CLUB_SHORT}</p>
       </div>
       <form id="registerForm">
         <div class="row g-4">

@@ -13,19 +13,15 @@ Pages.contact = async function(container) {
               </div>
               <div class="mb-3">
                 <i class="bi bi-geo-alt text-primary me-2"></i>
-                Thành phố Biên Hòa, Tỉnh Đồng Nai
+                ${CONFIG.CLUB_ADDRESS}
               </div>
               <div class="mb-3">
                 <i class="bi bi-envelope text-primary me-2"></i>
-                <a href="mailto:clbsv5t.dongnai@gmail.com">clbsv5t.dongnai@gmail.com</a>
+                <a href="mailto:${CONFIG.CONTACT_EMAIL}">${CONFIG.CONTACT_EMAIL}</a>
               </div>
               <div class="mb-3">
                 <i class="bi bi-facebook text-primary me-2"></i>
-                <a href="#" target="_blank">CLB SV5T Đồng Nai</a>
-              </div>
-              <div class="mb-3">
-                <i class="bi bi-telephone text-primary me-2"></i>
-                0901 234 567
+                <a href="${CONFIG.FACEBOOK_URL}" target="_blank" rel="noopener">${CONFIG.FACEBOOK_LABEL}</a>
               </div>
               <hr>
               <h6 class="text-primary">Giờ hoạt động</h6>

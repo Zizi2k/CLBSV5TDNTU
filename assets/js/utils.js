@@ -121,9 +121,18 @@ const Utils = {
     return tags.map(t => `<span class="${className}">${this.escapeHtml(t)}</span>`).join('');
   },
 
+  primaryColor() {
+    return (typeof CONFIG !== 'undefined' && CONFIG.COLORS?.primary) || '#0B84FF';
+  },
+
+  primaryColorDark() {
+    return (typeof CONFIG !== 'undefined' && CONFIG.COLORS?.primaryDark) || '#0066DD';
+  },
+
   defaultAvatar(name) {
     const initial = (name || '?').charAt(0).toUpperCase();
-    return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="#2563EB" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="40" font-family="Arial">${initial}</text></svg>`)}`;
+    const fill = this.primaryColor();
+    return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="${fill}" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="40" font-family="Arial">${initial}</text></svg>`)}`;
   },
 
   avatarUrl(url, name) {
@@ -333,7 +342,7 @@ const Utils = {
     return `data:image/svg+xml,${encodeURIComponent(
       `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200">` +
       `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">` +
-      `<stop offset="0%" stop-color="#2563EB"/><stop offset="100%" stop-color="#1D4ED8"/></linearGradient></defs>` +
+      `<stop offset="0%" stop-color="${this.primaryColor()}"/><stop offset="100%" stop-color="${this.primaryColorDark()}"/></linearGradient></defs>` +
       `<rect fill="url(#g)" width="400" height="200"/>` +
       `<text x="200" y="120" text-anchor="middle" fill="white" font-size="64" font-family="Arial">${initial}</text></svg>`
     )}`;
@@ -388,7 +397,7 @@ const Utils = {
     const headerRow = ws.addRow(headers);
     headerRow.height = 22;
     headerRow.eachCell(cell => {
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2563EB' } };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0B84FF' } };
       cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
       cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
       cell.border = {

@@ -239,7 +239,7 @@ function resetPassword(id) {
   logAudit('RESET_PASSWORD', id, null);
 
   try {
-    MailApp.sendEmail(user.email, 'Reset mật khẩu CLB SV5T', 'Mật khẩu mới của bạn: ' + newPassword);
+    MailApp.sendEmail(user.email, 'Reset mật khẩu CLB SV5T DNTU', 'Mật khẩu mới của bạn: ' + newPassword);
   } catch (e) { /* optional */ }
 
   return { message: 'Đã reset mật khẩu' };
@@ -249,11 +249,11 @@ function sendApprovalEmail(email, name) {
   const admins = getSheetData(SHEET_NAMES.USERS).filter(u => u.role === 'admin' || u.role === 'executive');
   const adminEmails = admins.map(a => a.email).join(',');
   if (adminEmails) {
-    MailApp.sendEmail(adminEmails, 'Đăng ký mới - CLB SV5T', name + ' (' + email + ') vừa đăng ký tham gia CLB. Vui lòng duyệt tài khoản.');
+    MailApp.sendEmail(adminEmails, 'Đăng ký mới - CLB SV5T DNTU', name + ' (' + email + ') vừa đăng ký tham gia CLB. Vui lòng duyệt tài khoản.');
   }
 }
 
 function sendApprovedEmail(email, name) {
-  MailApp.sendEmail(email, 'Tài khoản đã được duyệt - CLB SV5T',
-    'Xin chào ' + name + ',\n\nTài khoản của bạn đã được phê duyệt. Bạn có thể đăng nhập và tham gia các hoạt động CLB.\n\nTrân trọng,\nCLB SV5T TP. Đồng Nai');
+  MailApp.sendEmail(email, 'Tài khoản đã được duyệt - CLB SV5T DNTU',
+    'Xin chào ' + name + ',\n\nTài khoản của bạn đã được phê duyệt. Bạn có thể đăng nhập và tham gia các hoạt động CLB.\n\nTrân trọng,\nCLB SV5T DNTU');
 }

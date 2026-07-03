@@ -1,6 +1,6 @@
-# CLB SV5T Thành phố Đồng Nai
+# CLB SV5T DNTU
 
-Hệ thống quản lý thành viên và hoạt động cho CLB Sinh viên 5 Tốt Thành phố Đồng Nai.
+Hệ thống quản lý thành viên và hoạt động cho CLB SV5T DNTU.
 
 ## Kiến trúc
 
@@ -133,7 +133,7 @@ Chi tiết cột xem tại `docs/sheets-setup.md`.
 
 ## Giao diện
 
-- Màu chủ đạo: xanh dương `#2563EB`, vàng `#FACC15`, trắng
+- Màu chủ đạo: xanh dương radiant `#0B84FF`, vàng `#FACC15`, trắng
 - Bootstrap 5, responsive (mobile/tablet/desktop)
 - Card layout, bo góc, đổ bóng nhẹ, hiệu ứng chuyển trang
 
@@ -151,4 +151,4 @@ Truy cập `http://localhost:8080`
 
 ## License
 
-Dự án phục vụ CLB Sinh viên 5 Tốt Thành phố Đồng Nai.
+Dự án phục vụ CLB SV5T DNTU — Phường Trảng Dài, Thành phố Đồng Nai.
