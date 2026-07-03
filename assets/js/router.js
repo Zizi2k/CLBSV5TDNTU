@@ -82,6 +82,7 @@ const Router = {
     this.closeMobileNav();
 
     const container = document.getElementById('appContent');
+    Utils.resetLoading();
     Utils.showPageSkeleton(container);
 
     const pageEl = container.firstElementChild;

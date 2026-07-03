@@ -17,6 +17,20 @@ const Utils = {
     document.getElementById('loadingOverlay').classList.toggle('d-none', this._loadingCount === 0);
   },
 
+  resetLoading() {
+    this._loadingCount = 0;
+    document.getElementById('loadingOverlay')?.classList.add('d-none');
+  },
+
+  showInlineLoading(container, message = 'Đang tải...') {
+    if (!container) return;
+    container.innerHTML = `
+      <div class="text-center py-5 text-muted">
+        <div class="spinner-border text-primary mb-3" role="status"></div>
+        <p class="mb-0">${this.escapeHtml(message)}</p>
+      </div>`;
+  },
+
   loadScript(src) {
     if (this._scriptPromises[src]) return this._scriptPromises[src];
     this._scriptPromises[src] = new Promise((resolve, reject) => {

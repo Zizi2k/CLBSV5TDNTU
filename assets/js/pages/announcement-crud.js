@@ -159,7 +159,7 @@ const AnnouncementCRUD = {
   },
 
   async loadInto(container) {
-    const items = await API.getAnnouncements();
+    const items = await API.getAnnouncements({}, { silent: true });
     container.innerHTML = this.renderTable(items);
     this.bindEvents(container, () => this.loadInto(container));
   }

@@ -1,6 +1,5 @@
 Pages.manage = async function(container) {
-  let pending = [];
-  try { pending = await API.getPendingMembers(); } catch { /* empty */ }
+  const pending = await API.getPendingMembers({ silent: true }).catch(() => []);
 
   container.innerHTML = `
     <div class="container py-4">
@@ -27,13 +26,10 @@ Pages.manage = async function(container) {
   const content = document.getElementById('manageContent');
 
   async function loadTab(tab) {
+    Utils.showInlineLoading(content);
     switch (tab) {
       case 'pending':
         await PendingCRUD.loadInto(content);
-        try {
-          const p = await API.getPendingMembers();
-          document.getElementById('pendingBadge').textContent = p.length;
-        } catch { /* ignore */ }
         break;
       case 'activities':
         await ActivityCRUD.loadInto(content);
@@ -61,7 +57,8 @@ Pages.manage = async function(container) {
     await loadTab(link.dataset.tab);
   });
 
-  await PendingCRUD.loadInto(content);
+  PendingCRUD.renderInto(content, pending);
+  PendingCRUD.bindEvents(content, () => PendingCRUD.loadInto(content));
 };
 
 function renderScoresTab() {
@@ -97,7 +94,7 @@ function bindScoresEvents(container) {
     const form = e.target;
     const data = Object.fromEntries(new FormData(form));
     try {
-      await API.addScore(data);
+      await API.addScore(data, { silent: true });
       Utils.showToast('Đã cộng điểm thành công', 'success');
       form.reset();
     } catch (err) { /* handled */ }
@@ -141,7 +138,7 @@ function bindAttendanceEvents(container) {
       return;
     }
     try {
-      const result = await API.checkIn(activityId, qrCode);
+      const result = await API.checkIn(activityId, qrCode, { silent: true });
       Utils.showToast(result.message || 'Điểm danh thành công', 'success');
       container.querySelector('#qrInput').value = '';
     } catch (err) { /* handled */ }

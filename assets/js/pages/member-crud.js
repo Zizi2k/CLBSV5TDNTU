@@ -302,7 +302,7 @@ const MemberCRUD = {
   },
 
   async loadInto(container) {
-    const members = await API.getMembers();
+    const members = await API.getMembers({}, { silent: true });
     container.innerHTML = this.renderTable(members);
     this.bindEvents(container, () => this.loadInto(container));
   }

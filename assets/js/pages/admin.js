@@ -1,8 +1,12 @@
 Pages.admin = async function(container) {
-  let dashboard = { totalMembers: 0, pendingMembers: 0, totalActivities: 0, activeMembers: 0 };
-  try {
-    dashboard = await API.getDashboard();
-  } catch { /* use defaults */ }
+  const defaults = { totalMembers: 0, pendingMembers: 0, totalActivities: 0, activeMembers: 0 };
+
+  const [dashboard, pendingList] = await Promise.all([
+    API.getDashboard({ silent: true }).catch(() => defaults),
+    API.getPendingMembers({ silent: true }).catch(() => [])
+  ]);
+
+  const defaultTab = pendingList.length > 0 ? 'pending' : 'members';
 
   container.innerHTML = `
     <div class="container py-4">
@@ -39,8 +43,8 @@ Pages.admin = async function(container) {
         <div class="col-lg-3">
           <div class="admin-sidebar">
             <nav class="nav flex-column" id="adminNav">
-              <a class="nav-link active" href="#" data-tab="members"><i class="bi bi-people me-2"></i>Thành viên</a>
-              <a class="nav-link" href="#" data-tab="pending"><i class="bi bi-person-check me-2"></i>Duyệt tài khoản</a>
+              <a class="nav-link${defaultTab === 'members' ? ' active' : ''}" href="#" data-tab="members"><i class="bi bi-people me-2"></i>Thành viên</a>
+              <a class="nav-link${defaultTab === 'pending' ? ' active' : ''}" href="#" data-tab="pending"><i class="bi bi-person-check me-2"></i>Duyệt tài khoản${pendingList.length ? ` <span class="badge bg-danger ms-1">${pendingList.length}</span>` : ''}</a>
               <a class="nav-link" href="#" data-tab="activities"><i class="bi bi-calendar-event me-2"></i>Hoạt động</a>
               <a class="nav-link" href="#" data-tab="announcements"><i class="bi bi-megaphone me-2"></i>Thông báo</a>
               <a class="nav-link" href="#" data-tab="executive"><i class="bi bi-diagram-3 me-2"></i>Ban Chủ nhiệm</a>
@@ -76,14 +80,20 @@ Pages.admin = async function(container) {
     e.preventDefault();
     document.querySelectorAll('#adminNav .nav-link').forEach(l => l.classList.remove('active'));
     link.classList.add('active');
+    Utils.showInlineLoading(content, 'Đang tải...');
     await loadTab(link.dataset.tab);
   });
 
-  await MemberCRUD.loadInto(content);
+  if (defaultTab === 'pending') {
+    PendingCRUD.renderInto(content, pendingList);
+    PendingCRUD.bindEvents(content, () => PendingCRUD.loadInto(content));
+  } else {
+    await MemberCRUD.loadInto(content);
+  }
 };
 
 async function renderAdminExecutive() {
-  const board = await API.getExecutiveBoard();
+  const board = await API.getExecutiveBoard({ silent: true });
   return `
     <div class="card">
       <div class="card-header bg-white"><h5 class="mb-0">Ban Chủ nhiệm (${board.length})</h5></div>
@@ -107,7 +117,7 @@ async function renderAdminExecutive() {
 
 async function renderAdminAudit() {
   let logs = [];
-  try { logs = await API.getAuditLog(); } catch { logs = []; }
+  try { logs = await API.getAuditLog({ silent: true }); } catch { logs = []; }
   return `
     <div class="card">
       <div class="card-header bg-white"><h5 class="mb-0">Nhật ký hoạt động</h5></div>
@@ -125,7 +135,7 @@ async function renderAdminAudit() {
 
 async function renderAdminSettings() {
   let settings = {};
-  try { settings = await API.getSettings(); } catch { settings = {}; }
+  try { settings = await API.getSettings({ silent: true }); } catch { settings = {}; }
   const logoUrl = Utils.clubLogoUrl(settings.club_logo);
   return `
     <div class="card">

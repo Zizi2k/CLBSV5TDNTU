@@ -11,7 +11,7 @@ const PendingCRUD = {
           </thead>
           <tbody>
             ${pending.map(p => `
-              <tr>
+              <tr data-pending-id="${p.id}">
                 <td>${Utils.escapeHtml(p.name)}</td>
                 <td>${Utils.escapeHtml(p.mssv)}</td>
                 <td>${Utils.escapeHtml(p.email)}</td>
@@ -36,34 +36,76 @@ const PendingCRUD = {
     `;
   },
 
+  renderInto(container, pending) {
+    container.innerHTML = this.renderTable(pending);
+  },
+
+  _setButtonLoading(btn, loading) {
+    if (!btn) return;
+    if (loading) {
+      btn.disabled = true;
+      btn.dataset.originalHtml = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+    } else {
+      btn.disabled = false;
+      if (btn.dataset.originalHtml) btn.innerHTML = btn.dataset.originalHtml;
+    }
+  },
+
+  _updatePendingBadge(delta) {
+    document.querySelectorAll('#adminNav .badge, #pendingBadge').forEach(badge => {
+      const n = Math.max(0, (parseInt(badge.textContent, 10) || 0) + delta);
+      badge.textContent = n;
+      badge.classList.toggle('d-none', n === 0);
+    });
+  },
+
   bindEvents(container, reloadFn) {
     this._reloadFn = reloadFn;
 
     container.querySelectorAll('.btn-approve').forEach(btn => {
       btn.addEventListener('click', async () => {
+        const row = btn.closest('tr');
+        this._setButtonLoading(btn, true);
         try {
-          await API.approveMember(btn.dataset.id);
+          await API.approveMember(btn.dataset.id, { silent: true });
+          row?.remove();
+          this._updatePendingBadge(-1);
+          const card = container.querySelector('.card-header h5');
+          if (card) {
+            const left = container.querySelectorAll('[data-pending-id]').length;
+            card.textContent = `Duyệt tài khoản (${left})`;
+            if (!left) {
+              container.querySelector('.card-body').innerHTML = '<div class="empty-state py-4"><p>Không có đơn chờ duyệt</p></div>';
+            }
+          }
           Utils.showToast('Đã duyệt thành viên', 'success');
-          if (this._reloadFn) await this._reloadFn();
-        } catch (err) { /* handled */ }
+        } catch (err) {
+          this._setButtonLoading(btn, false);
+        }
       });
     });
 
     container.querySelectorAll('.btn-reject').forEach(btn => {
       btn.addEventListener('click', async () => {
         if (!confirm('Từ chối đơn đăng ký này?')) return;
+        const row = btn.closest('tr');
+        this._setButtonLoading(btn, true);
         try {
-          await API.deleteMember(btn.dataset.id);
+          await API.deleteMember(btn.dataset.id, { silent: true });
+          row?.remove();
+          this._updatePendingBadge(-1);
           Utils.showToast('Đã từ chối đơn đăng ký', 'info');
-          if (this._reloadFn) await this._reloadFn();
-        } catch (err) { /* handled */ }
+        } catch (err) {
+          this._setButtonLoading(btn, false);
+        }
       });
     });
   },
 
   async loadInto(container) {
-    const pending = await API.getPendingMembers();
-    container.innerHTML = this.renderTable(pending);
+    const pending = await API.getPendingMembers({ silent: true });
+    this.renderInto(container, pending);
     this.bindEvents(container, () => this.loadInto(container));
   }
 };

@@ -301,7 +301,7 @@ const ActivityCRUD = {
   },
 
   async loadInto(container) {
-    const activities = await API.getActivities();
+    const activities = await API.getActivities({}, { silent: true });
     container.innerHTML = this.renderTable(activities);
     this.ensureQrModal();
     this.bindEvents(container, () => this.loadInto(container));
