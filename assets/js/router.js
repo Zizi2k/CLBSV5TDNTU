@@ -121,7 +121,7 @@ const Router = {
 
   refresh() {
     AppStore.invalidateMany([
-      'getMembers', 'getMember', 'getActivities', 'getActivity',
+      'getHomeData', 'getMembers', 'getMember', 'getActivities', 'getActivity',
       'getAnnouncements', 'getExecutiveBoard', 'getDashboard',
       'getPendingMembers', 'getAuditLog', 'getScores'
     ]);

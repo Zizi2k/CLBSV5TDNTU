@@ -165,7 +165,7 @@ Pages.myProfile = async function(container) {
   });
   Utils.bindImageFallback(document.getElementById('profileClubLogoPreview'));
   Utils.bindImageFallback(document.getElementById('profileAvatarImg'));
-  Utils.renderQrCode(document.getElementById('personalQrCode'), Utils.buildProfileQrUrl(memberId), 160);
+  await Utils.renderQrCode(document.getElementById('personalQrCode'), Utils.buildProfileQrUrl(memberId), 160);
   document.getElementById('btnChangePassword')?.addEventListener('click', () => {
     new bootstrap.Modal(document.getElementById('changePasswordModal')).show();
   });

@@ -363,7 +363,7 @@ const ActivityCRUD = {
       document.getElementById('activityQrRegistered').textContent = (info.participants || 0) + ' đăng ký';
       document.getElementById('activityQrVisibleToggle').checked = !!info.qrVisible;
       const qrUrl = Utils.buildCheckInQrUrl(id, info.checkInCode);
-      Utils.renderQrCode(document.getElementById('activityQrCanvas'), qrUrl, 220);
+      await Utils.renderQrCode(document.getElementById('activityQrCanvas'), qrUrl, 220);
       new bootstrap.Modal(document.getElementById(this.qrModalId)).show();
     } catch (err) { /* handled */ }
   },

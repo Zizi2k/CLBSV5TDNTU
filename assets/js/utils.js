@@ -2,8 +2,51 @@
  * Tiện ích dùng chung
  */
 const Utils = {
+  _loadingCount: 0,
+  _scriptPromises: {},
+
+  SCRIPTS: {
+    qrcode: 'https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js',
+    exceljs: 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js',
+    html5qrcode: 'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js'
+  },
+
   showLoading(show = true) {
-    document.getElementById('loadingOverlay').classList.toggle('d-none', !show);
+    if (show) this._loadingCount++;
+    else this._loadingCount = Math.max(0, this._loadingCount - 1);
+    document.getElementById('loadingOverlay').classList.toggle('d-none', this._loadingCount === 0);
+  },
+
+  loadScript(src) {
+    if (this._scriptPromises[src]) return this._scriptPromises[src];
+    this._scriptPromises[src] = new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${src}"]`)) {
+        resolve();
+        return;
+      }
+      const el = document.createElement('script');
+      el.src = src;
+      el.async = true;
+      el.onload = () => resolve();
+      el.onerror = () => reject(new Error('Không tải được: ' + src));
+      document.head.appendChild(el);
+    });
+    return this._scriptPromises[src];
+  },
+
+  loadQRCode() {
+    if (typeof QRCode !== 'undefined') return Promise.resolve();
+    return this.loadScript(this.SCRIPTS.qrcode);
+  },
+
+  loadExcelJS() {
+    if (typeof ExcelJS !== 'undefined') return Promise.resolve();
+    return this.loadScript(this.SCRIPTS.exceljs);
+  },
+
+  loadHtml5Qrcode() {
+    if (typeof Html5Qrcode !== 'undefined') return Promise.resolve();
+    return this.loadScript(this.SCRIPTS.html5qrcode);
   },
 
   showPageSkeleton(container) {
@@ -201,7 +244,10 @@ const Utils = {
 
   async loadClubBranding() {
     try {
-      const settings = await API.getSettings();
+      const cached = AppStore.get('getSettings', {});
+      const settings = cached !== null
+        ? cached
+        : await API.request('getSettings', {}, { silent: true });
       const url = (settings?.club_logo || '').trim();
       this.applyClubLogos(url);
     } catch {
@@ -368,12 +414,13 @@ const Utils = {
     return result;
   },
 
-  renderQrCode(container, text, size = 200) {
+  async renderQrCode(container, text, size = 200) {
     if (!container || !text) return;
     container.innerHTML = '';
-    if (typeof QRCode !== 'undefined') {
+    try {
+      await this.loadQRCode();
       new QRCode(container, { text, width: size, height: size, correctLevel: QRCode.CorrectLevel.M });
-    } else {
+    } catch {
       container.textContent = text;
     }
   },
@@ -383,8 +430,10 @@ const Utils = {
       this.showToast('Không có dữ liệu để xuất', 'warning');
       return;
     }
-    if (typeof ExcelJS === 'undefined') {
-      this.showToast('Thư viện ExcelJS chưa được tải', 'danger');
+    try {
+      await this.loadExcelJS();
+    } catch {
+      this.showToast('Không tải được thư viện Excel', 'danger');
       return;
     }
 

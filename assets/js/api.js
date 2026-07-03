@@ -3,7 +3,7 @@
  */
 const API = {
   GET_ACTIONS: new Set([
-    'getMembers', 'getMember', 'getActivities', 'getActivity',
+    'getHomeData', 'getMembers', 'getMember', 'getActivities', 'getActivity',
     'getAnnouncements', 'getExecutiveBoard', 'getSettings'
   ]),
 
@@ -72,6 +72,7 @@ const API = {
 
       if (isCacheable) {
         AppStore.set(action, data, result.data);
+        if (action === 'getHomeData') this._seedHomeCache(result.data);
       }
       this._invalidateAfter(action);
 
@@ -95,6 +96,15 @@ const API = {
     }
   },
 
+  _seedHomeCache(data) {
+    if (!data) return;
+    const ttl = AppStore.DEFAULT_TTL;
+    if (data.activities) AppStore.set('getActivities', {}, data.activities, ttl);
+    if (data.announcements) AppStore.set('getAnnouncements', {}, data.announcements, ttl);
+    if (data.members) AppStore.set('getMembers', {}, data.members, ttl);
+    if (data.settings) AppStore.set('getSettings', {}, data.settings, ttl);
+  },
+
   // Auth
   login: (identifier, password) => API.request('login', { identifier, password }),
   register: (formData) => API.request('register', formData),
@@ -102,6 +112,9 @@ const API = {
   getProfile: () => API.request('getProfile'),
   updateProfile: (data) => API.request('updateProfile', data),
   changePassword: (data) => API.request('changePassword', data),
+
+  // Home (gộp API)
+  getHomeData: (options = {}) => API.request('getHomeData', {}, options),
 
   // Members
   getMembers: (filters = {}) => API.request('getMembers', filters),
@@ -628,6 +641,15 @@ const DemoData = {
       club_name: CONFIG.CLUB_NAME,
       contact_email: CONFIG.CONTACT_EMAIL,
       club_logo: localStorage.getItem('club_logo') || ''
+    };
+  },
+
+  getHomeData() {
+    return {
+      activities: DemoData.getActivities(),
+      announcements: DemoData.getAnnouncements(),
+      members: DemoData.getMembers(),
+      settings: DemoData.getSettings()
     };
   },
 

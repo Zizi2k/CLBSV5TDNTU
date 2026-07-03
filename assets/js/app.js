@@ -11,7 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initSpaNavigation();
   Auth.updateNavbar();
-  Utils.loadClubBranding();
+
+  const defer = window.requestIdleCallback || ((cb) => setTimeout(cb, 300));
+  defer(() => Utils.loadClubBranding());
 
   Router.register('home', Pages.home);
   Router.register('login', Pages.login);

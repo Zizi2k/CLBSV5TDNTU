@@ -264,6 +264,16 @@ function getSettings() {
   return settings;
 }
 
+/** Gộp dữ liệu trang chủ — 1 request thay vì 3–4 */
+function getHomeData() {
+  return {
+    activities: getActivities({}),
+    announcements: getAnnouncements({}),
+    members: getMembers({}),
+    settings: getSettings()
+  };
+}
+
 function getDashboard() {
   const members = getSheetData(SHEET_NAMES.MEMBERS);
   const users = getSheetData(SHEET_NAMES.USERS);

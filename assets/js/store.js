@@ -3,7 +3,7 @@
  */
 const AppStore = {
   cache: new Map(),
-  DEFAULT_TTL: 60000,
+  DEFAULT_TTL: 300000,
 
   _key(action, data) {
     return action + ':' + JSON.stringify(data || {});
@@ -44,23 +44,23 @@ const AppStore = {
 };
 
 const CACHE_INVALIDATION = {
-  login: ['getMembers', 'getDashboard', 'getPendingMembers', 'getAnnouncements', 'getActivities'],
+  login: ['getHomeData', 'getMembers', 'getDashboard', 'getPendingMembers', 'getAnnouncements', 'getActivities'],
   logout: [],
   register: ['getPendingMembers', 'getDashboard'],
-  addMember: ['getMembers', 'getDashboard', 'getMember'],
-  updateMember: ['getMembers', 'getMember', 'getDashboard'],
-  deleteMember: ['getMembers', 'getDashboard', 'getPendingMembers', 'getMember'],
-  approveMember: ['getMembers', 'getPendingMembers', 'getDashboard'],
-  lockMember: ['getMembers', 'getMember'],
+  addMember: ['getHomeData', 'getMembers', 'getDashboard', 'getMember'],
+  updateMember: ['getHomeData', 'getMembers', 'getMember', 'getDashboard'],
+  deleteMember: ['getHomeData', 'getMembers', 'getDashboard', 'getPendingMembers', 'getMember'],
+  approveMember: ['getHomeData', 'getMembers', 'getPendingMembers', 'getDashboard'],
+  lockMember: ['getHomeData', 'getMembers', 'getMember'],
   resetPassword: [],
-  addActivity: ['getActivities', 'getActivity', 'getDashboard'],
-  updateActivity: ['getActivities', 'getActivity'],
-  deleteActivity: ['getActivities', 'getActivity', 'getDashboard'],
-  joinActivity: ['getActivities', 'getActivity'],
-  addAnnouncement: ['getAnnouncements'],
-  updateAnnouncement: ['getAnnouncements'],
-  deleteAnnouncement: ['getAnnouncements'],
-  togglePinAnnouncement: ['getAnnouncements'],
+  addActivity: ['getHomeData', 'getActivities', 'getActivity', 'getDashboard'],
+  updateActivity: ['getHomeData', 'getActivities', 'getActivity'],
+  deleteActivity: ['getHomeData', 'getActivities', 'getActivity', 'getDashboard'],
+  joinActivity: ['getHomeData', 'getActivities', 'getActivity'],
+  addAnnouncement: ['getHomeData', 'getAnnouncements'],
+  updateAnnouncement: ['getHomeData', 'getAnnouncements'],
+  deleteAnnouncement: ['getHomeData', 'getAnnouncements'],
+  togglePinAnnouncement: ['getHomeData', 'getAnnouncements'],
   addScore: ['getScores', 'getMember'],
   checkIn: ['getActivities', 'getActivity'],
   memberCheckIn: ['getActivities', 'getActivity'],

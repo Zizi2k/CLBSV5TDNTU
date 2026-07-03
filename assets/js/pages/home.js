@@ -1,11 +1,14 @@
 const Pages = {};
 
 Pages.home = async function(container) {
-  const [activities, announcements, members] = await Promise.all([
-    API.getActivities(),
-    API.getAnnouncements(),
-    API.getMembers()
-  ]);
+  const data = await API.getHomeData({ silent: true });
+  const activities = data.activities || [];
+  const announcements = data.announcements || [];
+  const members = data.members || [];
+
+  if (data.settings) {
+    Utils.applyClubLogos((data.settings.club_logo || '').trim());
+  }
 
   const ongoing = activities.filter(a => a.status === 'ongoing' || Utils.getActivityStatus(a.startDate, a.endDate) === 'ongoing');
   const upcoming = activities.filter(a => a.status === 'upcoming' || Utils.getActivityStatus(a.startDate, a.endDate) === 'upcoming');

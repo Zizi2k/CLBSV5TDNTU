@@ -241,7 +241,14 @@ let _activeQrScanner = null;
 
 async function startAutoCheckInScanner(activityId, onSuccess) {
   const wrap = document.getElementById('qrScannerWrap');
-  if (!wrap || typeof Html5Qrcode === 'undefined') return;
+  if (!wrap) return;
+
+  try {
+    await Utils.loadHtml5Qrcode();
+  } catch {
+    Utils.showToast('Không tải được thư viện quét QR', 'danger');
+    return;
+  }
 
   if (_activeQrScanner) {
     try { await _activeQrScanner.stop(); } catch { /* ignore */ }
