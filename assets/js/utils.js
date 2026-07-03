@@ -106,6 +106,25 @@ const Utils = {
     document.getElementById(id).addEventListener('hidden.bs.toast', () => document.getElementById(id).remove());
   },
 
+  formatLongDate(date = new Date()) {
+    const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+    const dt = date instanceof Date ? date : new Date(date);
+    if (Number.isNaN(dt.getTime())) return '';
+    const dd = String(dt.getDate()).padStart(2, '0');
+    const mm = String(dt.getMonth() + 1).padStart(2, '0');
+    return `${days[dt.getDay()]}, ${dd}/${mm}/${dt.getFullYear()}`;
+  },
+
+  roleBadgeHtml(role) {
+    const text = role || 'Thành viên';
+    const lower = text.toLowerCase();
+    let variant = 'member';
+    if (lower.includes('admin')) variant = 'admin';
+    else if (lower.includes('chủ nhiệm') || lower.includes('ban chủ nhiệm')) variant = 'exec';
+    else if (lower.includes('thư ký')) variant = 'secretary';
+    return `<span class="role-badge role-badge-${variant}">${this.escapeHtml(text)}</span>`;
+  },
+
   formatDate(dateStr) {
     if (!dateStr) return '';
     const d = new Date(dateStr);

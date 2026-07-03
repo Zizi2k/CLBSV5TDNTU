@@ -7,34 +7,48 @@ const MemberCRUD = {
   renderTable(members) {
     const rows = members.length ? members.map(m => `
       <tr>
-        <td><code>${m.id}</code></td>
-        <td>${Utils.escapeHtml(m.name)}</td>
-        <td>${Utils.escapeHtml(m.email)}</td>
-        <td><span class="badge bg-primary">${Utils.escapeHtml(m.role)}</span></td>
+        <td><code class="member-id">${Utils.escapeHtml(m.id)}</code></td>
+        <td>
+          <div class="member-name-cell">
+            <img src="${Utils.avatarUrl(m.avatar, m.name)}" alt="" class="table-avatar" loading="lazy">
+            <span>${Utils.escapeHtml(m.name)}</span>
+          </div>
+        </td>
+        <td class="text-muted">${Utils.escapeHtml(m.email)}</td>
+        <td>${Utils.roleBadgeHtml(m.role)}</td>
         <td>${Utils.escapeHtml(m.school || '—')}</td>
-        <td class="text-nowrap">
-          <button class="btn btn-sm btn-outline-primary btn-edit-member" data-id="${m.id}" title="Sửa"><i class="bi bi-pencil"></i></button>
-          <button class="btn btn-sm btn-outline-warning btn-reset-pw" data-id="${m.id}" title="Reset MK"><i class="bi bi-key"></i></button>
-          <button class="btn btn-sm btn-outline-secondary btn-lock-member" data-id="${m.id}" title="Khóa"><i class="bi bi-lock"></i></button>
-          <button class="btn btn-sm btn-outline-danger btn-delete-member" data-id="${m.id}" title="Xóa"><i class="bi bi-trash"></i></button>
+        <td>
+          <div class="table-actions">
+            <a href="#profile/${m.id}" class="btn-action btn-action-view" title="Xem"><i class="bi bi-eye"></i></a>
+            <button type="button" class="btn-action btn-action-edit btn-edit-member" data-id="${m.id}" title="Sửa"><i class="bi bi-pencil"></i></button>
+            <button type="button" class="btn-action btn-action-lock btn-reset-pw" data-id="${m.id}" title="Reset MK"><i class="bi bi-key"></i></button>
+            <button type="button" class="btn-action btn-action-lock btn-lock-member" data-id="${m.id}" title="Khóa"><i class="bi bi-lock"></i></button>
+            <button type="button" class="btn-action btn-action-delete btn-delete-member" data-id="${m.id}" title="Xóa"><i class="bi bi-trash"></i></button>
+          </div>
         </td>
       </tr>
-    `).join('') : `<tr><td colspan="6" class="text-center text-muted py-4">Chưa có thành viên</td></tr>`;
+    `).join('') : `<tr><td colspan="6" class="text-center text-muted py-5">Chưa có thành viên</td></tr>`;
 
     return `
-      <div class="card" data-member-crud>
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Quản lý thành viên (${members.length})</h5>
-          <div>
-            <button class="btn btn-sm btn-outline-primary me-1" id="exportAllMembers"><i class="bi bi-download"></i> Xuất</button>
-            <button class="btn btn-sm btn-primary" id="btnAddMember"><i class="bi bi-plus-lg"></i> Thêm</button>
+      <div class="admin-panel-card" data-member-crud>
+        <div class="admin-panel-header">
+          <h5><i class="bi bi-people-fill me-2 text-primary"></i>Quản lý thành viên (${members.length})</h5>
+          <div class="admin-panel-actions">
+            <button type="button" class="btn btn-outline-primary btn-sm" id="exportAllMembers">
+              <i class="bi bi-download me-1"></i>Xuất Excel
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" id="btnAddMember">
+              <i class="bi bi-plus-lg me-1"></i>Thêm thành viên
+            </button>
           </div>
         </div>
-        <div class="card-body p-0">
+        <div class="admin-panel-body p-0">
           <div class="table-responsive">
-            <table class="table table-hover mb-0">
-              <thead class="table-light">
-                <tr><th>Mã</th><th>Họ tên</th><th>Email</th><th>Vai trò</th><th>Trường</th><th>Thao tác</th></tr>
+            <table class="table admin-table mb-0">
+              <thead>
+                <tr>
+                  <th>Mã</th><th>Họ tên</th><th>Email</th><th>Vai trò</th><th>Trường</th><th>Thao tác</th>
+                </tr>
               </thead>
               <tbody>${rows}</tbody>
             </table>
@@ -304,6 +318,7 @@ const MemberCRUD = {
   async loadInto(container) {
     const members = await API.getMembers({}, { silent: true });
     container.innerHTML = this.renderTable(members);
+    container.querySelectorAll('.table-avatar').forEach(img => Utils.bindImageFallback(img));
     this.bindEvents(container, () => this.loadInto(container));
   }
 };

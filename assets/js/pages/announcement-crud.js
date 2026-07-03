@@ -23,12 +23,12 @@ const AnnouncementCRUD = {
     `).join('') : '<div class="empty-state py-4"><p>Chưa có thông báo</p></div>';
 
     return `
-      <div class="card">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Quản lý thông báo (${items.length})</h5>
-          <button class="btn btn-sm btn-primary" id="btnAddAnnouncement"><i class="bi bi-plus-lg me-1"></i>Đăng thông báo</button>
+      <div class="admin-panel-card">
+        <div class="admin-panel-header">
+          <h5><i class="bi bi-megaphone-fill me-2 text-primary"></i>Quản lý thông báo (${items.length})</h5>
+          <button type="button" class="btn btn-primary btn-sm" id="btnAddAnnouncement"><i class="bi bi-plus-lg me-1"></i>Đăng thông báo</button>
         </div>
-        <div class="card-body">${rows}</div>
+        <div class="admin-panel-body">${rows}</div>
       </div>
     `;
   },

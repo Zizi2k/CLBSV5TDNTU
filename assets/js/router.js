@@ -77,6 +77,7 @@ const Router = {
 
     this.currentPage = routeName;
     this.currentParams = routeParams;
+    document.body.classList.toggle('layout-dashboard', routeName === 'admin');
     this.updateActiveNav(routeName);
     this.updateTitle(routeName);
     this.closeMobileNav();

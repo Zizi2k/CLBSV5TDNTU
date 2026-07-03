@@ -88,8 +88,16 @@ const Auth = {
 
       authNav.innerHTML = `
         ${dashboardLink}
-        <li class="nav-item"><a class="nav-link" href="#my-profile" data-page="my-profile"><i class="bi bi-person-circle"></i> ${Utils.escapeHtml(user.name)}</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" id="btnLogout"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+        <li class="nav-item nav-user-chip">
+          <a class="nav-link nav-user-link" href="#my-profile" data-page="my-profile">
+            <img src="${Utils.avatarUrl(user.avatar, user.name)}" alt="" class="nav-user-avatar">
+            <span class="nav-user-text d-none d-lg-inline">
+              <span class="nav-user-name">${Utils.escapeHtml(user.name)}</span>
+              <small class="nav-user-role">${Utils.escapeHtml(CONFIG.ROLES[user.role] || user.role)}</small>
+            </span>
+          </a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="#" id="btnLogout"><i class="bi bi-box-arrow-right"></i><span class="d-none d-md-inline"> Đăng xuất</span></a></li>
       `;
       document.getElementById('btnLogout')?.addEventListener('click', (e) => {
         e.preventDefault();

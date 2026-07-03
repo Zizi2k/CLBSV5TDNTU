@@ -5,8 +5,8 @@ const PendingCRUD = {
   renderTable(pending) {
     const body = pending.length ? `
       <div class="table-responsive">
-        <table class="table table-hover mb-0">
-          <thead class="table-light">
+        <table class="table admin-table mb-0">
+          <thead>
             <tr><th>Họ tên</th><th>MSSV</th><th>Email</th><th>Trường</th><th>Ngày đăng ký</th><th></th></tr>
           </thead>
           <tbody>
@@ -29,9 +29,11 @@ const PendingCRUD = {
     ` : '<div class="empty-state py-4"><p>Không có đơn chờ duyệt</p></div>';
 
     return `
-      <div class="card">
-        <div class="card-header bg-white"><h5 class="mb-0">Duyệt tài khoản (${pending.length})</h5></div>
-        <div class="card-body p-0">${body}</div>
+      <div class="admin-panel-card">
+        <div class="admin-panel-header">
+          <h5><i class="bi bi-person-check-fill me-2 text-primary"></i>Duyệt tài khoản (${pending.length})</h5>
+        </div>
+        <div class="admin-panel-body p-0">${body}</div>
       </div>
     `;
   },

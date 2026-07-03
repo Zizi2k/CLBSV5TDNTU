@@ -36,17 +36,17 @@ const ActivityCRUD = {
     }).join('') : `<tr><td colspan="6" class="text-center text-muted py-4">Chưa có hoạt động nào</td></tr>`;
 
     return `
-      <div class="card activity-crud-panel" data-activity-crud>
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Quản lý hoạt động (${activities.length})</h5>
-          <button class="btn btn-sm btn-primary" id="btnAddActivity">
+      <div class="admin-panel-card activity-crud-panel" data-activity-crud>
+        <div class="admin-panel-header">
+          <h5><i class="bi bi-calendar-event-fill me-2 text-primary"></i>Quản lý hoạt động (${activities.length})</h5>
+          <button type="button" class="btn btn-primary btn-sm" id="btnAddActivity">
             <i class="bi bi-plus-lg me-1"></i>Thêm hoạt động
           </button>
         </div>
-        <div class="card-body p-0">
+        <div class="admin-panel-body p-0">
           <div class="table-responsive">
-            <table class="table table-hover mb-0">
-              <thead class="table-light">
+            <table class="table admin-table mb-0">
+              <thead>
                 <tr>
                   <th>Tên</th>
                   <th>Thời gian</th>
