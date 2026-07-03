@@ -8,7 +8,15 @@ const API = {
   ]),
 
   CACHEABLE_ACTIONS: new Set([
-    'getDashboard', 'getPendingMembers', 'getAuditLog', 'getProfile'
+    'getDashboard', 'getPendingMembers', 'getAuditLog', 'getProfile',
+    'getScores', 'getActivityParticipants'
+  ]),
+
+  /** Thao tác nhanh — không chặn màn hình bằng overlay toàn trang */
+  SILENT_MUTATIONS: new Set([
+    'joinActivity', 'memberCheckIn', 'approveMember', 'lockMember', 'resetPassword',
+    'deleteMember', 'deleteActivity', 'deleteAnnouncement', 'togglePinAnnouncement',
+    'addScore', 'setActivityQrVisible', 'logout'
   ]),
 
   _inflight: new Map(),
@@ -17,8 +25,29 @@ const API = {
     return !CONFIG.API_URL || CONFIG.API_URL.includes('YOUR_GOOGLE_APPS_SCRIPT');
   },
 
+  _defaultSilent(action) {
+    return /^get/.test(action) || this.SILENT_MUTATIONS.has(action);
+  },
+
+  warmupConnection() {
+    if (this.isDemoMode()) return;
+    this.getHomeData({ silent: true }).catch(() => {});
+  },
+
+  prefetchAfterLogin(user) {
+    if (this.isDemoMode() || !user) return;
+    const tasks = [this.getHomeData({ silent: true })];
+    if (user.role === 'admin') {
+      tasks.push(this.getDashboard({ silent: true }), this.getPendingMembers({ silent: true }));
+    } else if (user.role === 'executive') {
+      tasks.push(this.getPendingMembers({ silent: true }));
+    }
+    Promise.all(tasks).catch(() => {});
+  },
+
   async request(action, data = {}, options = {}) {
-    const { method, silent = false, useCache = true, skipAuthHandler = false } = options;
+    const { method, useCache = true, skipAuthHandler = false } = options;
+    const silent = options.silent !== undefined ? options.silent : this._defaultSilent(action);
 
     if (this.isDemoMode()) {
       console.warn('API_URL chưa được cấu hình. Sử dụng dữ liệu demo.');
@@ -130,7 +159,7 @@ const API = {
   login: (identifier, password) => API.request('login', { identifier, password }),
   register: (formData) => API.request('register', formData),
   logout: () => API.request('logout'),
-  getProfile: () => API.request('getProfile'),
+  getProfile: (options = {}) => API.request('getProfile', {}, options),
   updateProfile: (data) => API.request('updateProfile', data),
   changePassword: (data) => API.request('changePassword', data),
 
@@ -139,22 +168,22 @@ const API = {
 
   // Members
   getMembers: (filters = {}, options = {}) => API.request('getMembers', filters, options),
-  getMember: (id) => API.request('getMember', { id }),
+  getMember: (id, options = {}) => API.request('getMember', { id }, options),
   addMember: (data) => API.request('addMember', data),
   updateMember: (id, data) => API.request('updateMember', { id, ...data }),
   deleteMember: (id, options = {}) => API.request('deleteMember', { id }, options),
   approveMember: (id, options = {}) => API.request('approveMember', { id }, options),
-  lockMember: (id) => API.request('lockMember', { id }),
-  resetPassword: (id) => API.request('resetPassword', { id }),
+  lockMember: (id, options = {}) => API.request('lockMember', { id }, options),
+  resetPassword: (id, options = {}) => API.request('resetPassword', { id }, options),
 
   // Activities
   getActivities: (filters = {}, options = {}) => API.request('getActivities', filters, options),
-  getActivity: (id) => API.request('getActivity', { id }),
+  getActivity: (id, options = {}) => API.request('getActivity', { id }, options),
   addActivity: (data) => API.request('addActivity', data),
   updateActivity: (id, data) => API.request('updateActivity', { id, ...data }),
-  deleteActivity: (id) => API.request('deleteActivity', { id }),
-  joinActivity: (activityId) => API.request('joinActivity', { activityId }),
-  getActivityParticipants: (activityId) => API.request('getActivityParticipants', { activityId }),
+  deleteActivity: (id, options = {}) => API.request('deleteActivity', { id }, options),
+  joinActivity: (activityId, options = {}) => API.request('joinActivity', { activityId }, options),
+  getActivityParticipants: (activityId, options = {}) => API.request('getActivityParticipants', { activityId }, options),
 
   // Announcements
   getAnnouncements: (filters = {}, options = {}) => API.request('getAnnouncements', filters, options),
@@ -168,14 +197,14 @@ const API = {
   updateExecutiveBoard: (data) => API.request('updateExecutiveBoard', data),
 
   // Scores
-  getScores: (memberId) => API.request('getScores', { memberId }),
+  getScores: (memberId, options = {}) => API.request('getScores', { memberId }, options),
   addScore: (data, options = {}) => API.request('addScore', data, options),
 
   // Attendance
   checkIn: (activityId, qrCode, options = {}) => API.request('checkIn', { activityId, qrCode }, options),
   getActivityCheckInInfo: (activityId) => API.request('getActivityCheckInInfo', { activityId }, { useCache: false }),
   setActivityQrVisible: (activityId, visible) => API.request('setActivityQrVisible', { activityId, visible }),
-  memberCheckIn: (activityId, data) => API.request('memberCheckIn', { activityId, ...data }),
+  memberCheckIn: (activityId, data, options = {}) => API.request('memberCheckIn', { activityId, ...data }, options),
   getActivityAttendanceList: (activityId) => API.request('getActivityAttendanceList', { activityId }, { useCache: false }),
   uploadAttendanceProof: (base64, filename, activityId) => API.request('uploadAttendanceProof', { base64, filename, activityId }),
 
@@ -183,7 +212,7 @@ const API = {
   getDashboard: (options = {}) => API.request('getDashboard', {}, options),
   getPendingMembers: (options = {}) => API.request('getPendingMembers', {}, options),
   getAuditLog: (options = {}) => API.request('getAuditLog', {}, options),
-  getSettings: () => API.request('getSettings'),
+  getSettings: (options = {}) => API.request('getSettings', {}, options),
 
   // Upload avatar (base64)
   uploadAvatar: (base64, filename, memberId) => API.request('uploadAvatar', { base64, filename, memberId }),

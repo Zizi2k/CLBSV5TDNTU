@@ -4,6 +4,10 @@
 document.addEventListener('DOMContentLoaded', () => {
   applySiteBranding();
 
+  try {
+    Utils.applyClubLogos((localStorage.getItem('club_logo') || '').trim());
+  } catch { /* ignore */ }
+
   const verEl = document.getElementById('appVersion');
   if (verEl && CONFIG.APP_VERSION) {
     verEl.textContent = `v${CONFIG.APP_VERSION} · SPA`;
@@ -13,7 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
   Auth.updateNavbar();
 
   const defer = window.requestIdleCallback || ((cb) => setTimeout(cb, 300));
-  defer(() => Utils.loadClubBranding());
+  defer(() => {
+    Utils.loadClubBranding();
+    API.warmupConnection();
+  });
 
   Router.register('home', Pages.home);
   Router.register('login', Pages.login);

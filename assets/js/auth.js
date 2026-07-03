@@ -39,6 +39,7 @@ const Auth = {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
     AppStore.clear();
     this.updateNavbar();
+    API.prefetchAfterLogin(data.user);
     return data.user;
   },
 

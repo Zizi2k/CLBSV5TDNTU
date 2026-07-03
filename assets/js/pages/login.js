@@ -10,7 +10,7 @@ Pages.login = async function(container) {
         <div class="col-md-5">
           <div class="form-section">
             <div class="text-center mb-4">
-              <img src="assets/img/logo.svg" alt="Logo" width="64" height="64" class="club-logo">
+              <img src="${Utils.clubLogoUrl()}" alt="Logo" width="64" height="64" class="club-logo" id="loginClubLogo">
               <h3 class="mt-3">Đăng nhập</h3>
               <p class="text-muted">Đăng nhập vào hệ thống ${CONFIG.CLUB_SHORT}</p>
             </div>
@@ -42,6 +42,11 @@ Pages.login = async function(container) {
       </div>
     </div>
   `;
+
+  const loginLogo = document.getElementById('loginClubLogo');
+  if (loginLogo) {
+    Utils.bindImageFallback(loginLogo, Utils.resolveAsset(Utils.DEFAULT_CLUB_LOGO));
+  }
 
   document.getElementById('togglePassword').addEventListener('click', () => {
     const input = document.getElementById('loginPassword');

@@ -113,16 +113,39 @@ Pages.checkin = async function(container, params) {
 };
 
 Pages.activityDetail = async function(container, id) {
-  const activities = await API.getActivities();
-  const activity = activities.find(a => a.id === id) || activities[0];
-  const status = activity.status || Utils.getActivityStatus(activity.startDate, activity.endDate);
-
+  let activity;
   let checkInInfo = null;
-  if (Auth.isLoggedIn() && status === 'ongoing') {
-    try {
-      checkInInfo = await API.getActivityCheckInInfo(id);
-    } catch { checkInInfo = null; }
+
+  try {
+    const fetches = [API.getActivity(id)];
+    if (Auth.isLoggedIn()) {
+      fetches.push(API.getActivityCheckInInfo(id).catch(() => null));
+    }
+    const results = await Promise.all(fetches);
+    activity = results[0];
+    checkInInfo = Auth.isLoggedIn() ? results[1] : null;
+  } catch (err) {
+    container.innerHTML = `
+      <div class="container py-5 text-center page-enter">
+        <i class="bi bi-exclamation-circle text-danger display-4 mb-3"></i>
+        <h4>Không tìm thấy hoạt động</h4>
+        <p class="text-muted">${Utils.escapeHtml(err.message || 'Hoạt động không tồn tại')}</p>
+        <a href="#activities" class="btn btn-primary">Quay lại danh sách</a>
+      </div>`;
+    return;
   }
+
+  if (!activity) {
+    container.innerHTML = `
+      <div class="container py-5 text-center page-enter">
+        <h4>Không tìm thấy hoạt động</h4>
+        <a href="#activities" class="btn btn-primary mt-3">Quay lại danh sách</a>
+      </div>`;
+    return;
+  }
+
+  const status = activity.status || Utils.getActivityStatus(activity.startDate, activity.endDate);
+  if (status !== 'ongoing') checkInInfo = null;
 
   const isRegistered = checkInInfo && (checkInInfo.isRegistered || checkInInfo.registered);
   const hasCheckedIn = checkInInfo && (checkInInfo.hasCheckedIn || checkInInfo.alreadyCheckedIn);
