@@ -186,13 +186,68 @@ function backfillActivityCheckInCodes() {
   let count = 0;
   const activities = getSheetData(SHEET_NAMES.ACTIVITIES);
   activities.forEach(a => {
-    if (!a.checkInCode) {
+    if (!a.id || a.checkInCode) return;
+    try {
       const code = Utilities.getUuid().replace(/-/g, '').slice(0, 8).toUpperCase();
       updateRow(SHEET_NAMES.ACTIVITIES, a.id, { checkInCode: code });
       count++;
+    } catch (e) {
+      Logger.log('backfill skip ' + a.id + ': ' + e.message);
     }
   });
   return count;
+}
+
+/**
+ * Chạy thủ công trong Apps Script Editor để kiểm tra backend.
+ * Nếu báo lỗi — xem Execution log (View > Executions).
+ */
+function runHealthCheck() {
+  const report = { ok: true, at: formatDateTime(now()), checks: [] };
+
+  function check(name, fn) {
+    try {
+      const result = fn();
+      report.checks.push({ name: name, ok: true, result: result });
+    } catch (err) {
+      report.ok = false;
+      report.checks.push({ name: name, ok: false, error: err.message });
+    }
+  }
+
+  check('SPREADSHEET_ID', () => {
+    const id = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
+    if (!id) throw new Error('Chưa có SPREADSHEET_ID — chạy initializeSheets() lần đầu HOẶC dán ID vào Script Properties');
+    return id;
+  });
+
+  check('AVATAR_FOLDER_ID', () => {
+    const id = PropertiesService.getScriptProperties().getProperty('AVATAR_FOLDER_ID');
+    if (!id) throw new Error('Chưa có AVATAR_FOLDER_ID');
+    return id;
+  });
+
+  check('openSpreadsheet', () => getSpreadsheet().getName());
+
+  Object.keys(SHEET_SCHEMA).forEach(sheetName => {
+    check('sheet:' + sheetName, () => {
+      const sheet = getSpreadsheet().getSheetByName(sheetName);
+      if (!sheet) throw new Error('Thiếu sheet ' + sheetName);
+      return { rows: sheet.getLastRow() };
+    });
+  });
+
+  check('getHomeData', () => {
+    const data = getHomeData();
+    return {
+      activities: (data.activities || []).length,
+      members: (data.members || []).length,
+      announcements: (data.announcements || []).length
+    };
+  });
+
+  Logger.log(JSON.stringify(report, null, 2));
+  return report;
 }
 
 function seedData(ss) {

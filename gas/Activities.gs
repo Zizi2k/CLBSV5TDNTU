@@ -2,15 +2,29 @@
  * Quản lý hoạt động & điểm danh
  */
 
-function getActivities(filters) {
-  return getSheetData(SHEET_NAMES.ACTIVITIES).map(a => sanitizeActivity(a));
+function buildActivityCounts() {
+  const participantCounts = {};
+  const attendanceCounts = {};
+  getSheetData(SHEET_NAMES.ACTIVITY_PARTICIPANTS).forEach(p => {
+    if (!p.activityId) return;
+    participantCounts[p.activityId] = (participantCounts[p.activityId] || 0) + 1;
+  });
+  getSheetData(SHEET_NAMES.ATTENDANCE).forEach(at => {
+    if (!at.activityId) return;
+    attendanceCounts[at.activityId] = (attendanceCounts[at.activityId] || 0) + 1;
+  });
+  return { participantCounts, attendanceCounts };
 }
 
-function sanitizeActivity(a) {
-  const participants = getSheetData(SHEET_NAMES.ACTIVITY_PARTICIPANTS)
-    .filter(p => p.activityId === a.id).length;
-  const attendanceCount = getSheetData(SHEET_NAMES.ATTENDANCE)
-    .filter(at => at.activityId === a.id).length;
+function getActivities(filters) {
+  const activities = getSheetData(SHEET_NAMES.ACTIVITIES);
+  const counts = buildActivityCounts();
+  return activities.map(a => sanitizeActivity(a, counts));
+}
+
+function sanitizeActivity(a, counts) {
+  const participantCounts = counts?.participantCounts || {};
+  const attendanceCounts = counts?.attendanceCounts || {};
   return {
     id: a.id,
     name: a.name,
@@ -22,8 +36,8 @@ function sanitizeActivity(a) {
     report: a.report,
     checkInCode: a.checkInCode || '',
     qrVisible: a.qrVisible === true || a.qrVisible === 'TRUE',
-    participants: participants,
-    attendanceCount: attendanceCount,
+    participants: participantCounts[a.id] || 0,
+    attendanceCount: attendanceCounts[a.id] || 0,
     status: getActivityStatus(a.startDate, a.endDate)
   };
 }
@@ -31,7 +45,8 @@ function sanitizeActivity(a) {
 function getActivity(id) {
   const raw = getSheetData(SHEET_NAMES.ACTIVITIES).find(a => a.id === id);
   if (!raw) throw new Error('Không tìm thấy hoạt động');
-  return sanitizeActivity(raw);
+  const counts = buildActivityCounts();
+  return sanitizeActivity(raw, counts);
 }
 
 function getActivityStatus(startDate, endDate) {

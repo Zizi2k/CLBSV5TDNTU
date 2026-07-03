@@ -117,6 +117,40 @@ function deleteRow(sheetName, id, idCol = 'id') {
   found.sheet.deleteRow(found.row);
 }
 
+function maybeCleanupSessions() {
+  try {
+    const cache = CacheService.getScriptCache();
+    if (cache.get('session_cleanup')) return;
+    cleanupExpiredSessions();
+    cache.put('session_cleanup', '1', 3600);
+  } catch (e) {
+    Logger.log('maybeCleanupSessions: ' + e.message);
+  }
+}
+
+function cleanupExpiredSessions() {
+  const sessions = getSheetData(SHEET_NAMES.SESSIONS);
+  const nowTs = now().getTime();
+  sessions.forEach(s => {
+    if (!s.token) return;
+    const exp = new Date(s.expiresAt).getTime();
+    if (!isNaN(exp) && exp < nowTs) {
+      try {
+        deleteRow(SHEET_NAMES.SESSIONS, s.token, 'token');
+      } catch (e) { /* ignore */ }
+    }
+  });
+}
+
+function safeSendEmail(to, subject, body) {
+  if (!to) return;
+  try {
+    MailApp.sendEmail(String(to), subject, body);
+  } catch (e) {
+    Logger.log('Email skip (' + subject + '): ' + e.message);
+  }
+}
+
 function logAudit(action, details, token) {
   try {
     let userId = 'system';

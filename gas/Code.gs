@@ -14,6 +14,7 @@ function doPost(e) {
 function handleRequest(e, method) {
   try {
     ensureDatabaseSchema();
+    maybeCleanupSessions();
   } catch (migrateErr) {
     Logger.log('Schema migration: ' + migrateErr.message);
   }
