@@ -128,7 +128,14 @@ const API = {
 
       return result.data;
     } catch (err) {
-      if (!silent && !Auth._loggingOut) Utils.showToast(err.message, 'danger');
+      if (!silent && !Auth._loggingOut) {
+        const raw = err && err.message ? String(err.message) : '';
+        const friendly = (!raw || raw === 'Failed to fetch' || err.name === 'TypeError')
+          ? 'Không kết nối được máy chủ. Thử lại sau vài giây (Apps Script đang khởi động hoặc Deploy chưa cập nhật).'
+          : raw;
+        Utils.showToast(friendly, 'danger');
+        throw new Error(friendly);
+      }
       throw err;
     } finally {
       if (!silent) Utils.showLoading(false);

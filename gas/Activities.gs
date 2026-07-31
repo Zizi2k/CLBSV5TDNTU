@@ -105,9 +105,8 @@ function addActivity(payload, user) {
   });
   logAudit('ADD_ACTIVITY', id, null);
 
-  let emailed = 0;
   try {
-    const result = notifyNewActivity({
+    queueNewActivityNotification({
       id: id,
       name: payload.name,
       description: payload.description || '',
@@ -116,16 +115,13 @@ function addActivity(payload, user) {
       endDate: payload.endDate,
       location: payload.location || ''
     });
-    emailed = result && result.sent ? result.sent : 0;
   } catch (e) {
-    Logger.log('notifyNewActivity: ' + e.message);
+    Logger.log('queueNewActivityNotification: ' + e.message);
   }
 
   return {
     id: id,
-    message: emailed
-      ? 'Đã thêm hoạt động và gửi email thông báo cho ' + emailed + ' thành viên'
-      : 'Đã thêm hoạt động'
+    message: 'Đã thêm hoạt động. Email thông báo sẽ gửi trong ít phút.'
   };
 }
 

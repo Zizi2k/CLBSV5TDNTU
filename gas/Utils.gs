@@ -216,6 +216,69 @@ function notifyNewActivity(activity) {
   return { sent: sent };
 }
 
+/** Xếp hàng gửi email — không chặn API (tránh Failed to fetch / timeout) */
+function queueNewActivityNotification(activity) {
+  const props = PropertiesService.getScriptProperties();
+  const key = 'PENDING_ACTIVITY_NOTIFY';
+  let queue = [];
+  try {
+    queue = JSON.parse(props.getProperty(key) || '[]');
+    if (!Array.isArray(queue)) queue = [];
+  } catch (e) {
+    queue = [];
+  }
+  queue.push(activity);
+  props.setProperty(key, JSON.stringify(queue));
+
+  const hasTrigger = ScriptApp.getProjectTriggers().some(function (t) {
+    return t.getHandlerFunction() === 'processPendingActivityNotifications';
+  });
+  if (!hasTrigger) {
+    ScriptApp.newTrigger('processPendingActivityNotifications')
+      .timeBased()
+      .after(15 * 1000)
+      .create();
+  }
+}
+
+function processPendingActivityNotifications() {
+  const props = PropertiesService.getScriptProperties();
+  const key = 'PENDING_ACTIVITY_NOTIFY';
+  let queue = [];
+  try {
+    queue = JSON.parse(props.getProperty(key) || '[]');
+    if (!Array.isArray(queue)) queue = [];
+  } catch (e) {
+    queue = [];
+  }
+  props.deleteProperty(key);
+
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'processPendingActivityNotifications') {
+      try { ScriptApp.deleteTrigger(t); } catch (e) { /* ignore */ }
+    }
+  });
+
+  queue.forEach(function (activity) {
+    try {
+      notifyNewActivity(activity);
+    } catch (e) {
+      Logger.log('process notify: ' + e.message);
+    }
+  });
+
+  // Nếu trong lúc gửi lại có hàng đợi mới
+  try {
+    const more = JSON.parse(props.getProperty(key) || '[]');
+    if (Array.isArray(more) && more.length) {
+      ScriptApp.newTrigger('processPendingActivityNotifications')
+        .timeBased()
+        .after(20 * 1000)
+        .create();
+    }
+  } catch (e) { /* ignore */ }
+}
+
 function logAudit(action, details, token) {
   try {
     let userId = 'system';
