@@ -69,6 +69,13 @@ Pages.home = async function(container) {
       </section>
     </div>
   `;
+
+  const homeActivities = [...ongoing.slice(0, 3), ...upcoming.slice(0, 3)];
+  container.querySelectorAll('.activity-cover').forEach(img => {
+    const actId = img.dataset.activityId;
+    const activity = homeActivities.find(a => a.id === actId) || activities.find(a => a.id === actId);
+    if (activity) Utils.renderActivityCover(img, activity);
+  });
 };
 
 function renderActivitySection(title, items, status) {
@@ -91,9 +98,7 @@ function renderActivityCard(a, status) {
   return `
     <div class="col-md-4">
       <div class="card activity-card h-100">
-        <div class="card-img-top bg-primary d-flex align-items-center justify-content-center" style="height:160px">
-          <i class="bi bi-calendar-event text-white" style="font-size:3rem"></i>
-        </div>
+        <img data-activity-id="${a.id}" class="card-img-top activity-cover" alt="${Utils.escapeHtml(a.name)}">
         <span class="status-badge ${Utils.statusClass(st)}">${Utils.statusLabel(st)}</span>
         <div class="card-body">
           <h5 class="card-title">${Utils.escapeHtml(a.name)}</h5>
