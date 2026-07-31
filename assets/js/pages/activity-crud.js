@@ -96,6 +96,18 @@ const ActivityCRUD = {
                     <input type="text" class="form-control" name="location" id="activityLocation" placeholder="VD: Khuôn viên trường, Phường Trảng Dài">
                   </div>
                   <div class="col-12">
+                    <label class="form-label">Tiêu chí SV5T <span class="text-danger">*</span></label>
+                    <div class="criterion-options" id="activityCriterionGroup">
+                      ${(CONFIG.ACTIVITY_CRITERIA || []).map((c, i) => `
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="criterion" id="criterion_${i}" value="${Utils.escapeHtml(c)}" ${i === 0 ? 'required' : ''}>
+                          <label class="form-check-label" for="criterion_${i}">${Utils.escapeHtml(c)}</label>
+                        </div>
+                      `).join('')}
+                    </div>
+                    <p class="form-text mb-0">Chọn 1 trong các tiêu chí Sinh viên 5 tốt</p>
+                  </div>
+                  <div class="col-12">
                     <label class="form-label">Mô tả</label>
                     <textarea class="form-control" name="description" id="activityDescription" rows="3"></textarea>
                   </div>
@@ -190,6 +202,8 @@ const ActivityCRUD = {
     document.getElementById('activityId').value = '';
     document.getElementById('activityModalTitle').textContent = 'Thêm hoạt động';
     document.getElementById('activityReportGroup').classList.add('d-none');
+    const firstCriterion = document.querySelector('#activityCriterionGroup input[name="criterion"]');
+    if (firstCriterion) firstCriterion.checked = true;
     const preview = document.getElementById('activityImagePreview');
     if (preview) { preview.src = ''; preview.classList.add('d-none'); }
     new bootstrap.Modal(document.getElementById(this.modalId)).show();
@@ -212,6 +226,19 @@ const ActivityCRUD = {
       document.getElementById('activityDescription').value = activity.description || '';
       document.getElementById('activityReport').value = activity.report || '';
       document.getElementById('activityModalTitle').textContent = 'Sửa hoạt động';
+
+      const criterion = activity.criterion || '';
+      const radios = document.querySelectorAll('#activityCriterionGroup input[name="criterion"]');
+      let matched = false;
+      radios.forEach(r => {
+        r.checked = r.value === criterion;
+        if (r.checked) matched = true;
+      });
+      if (!matched && radios.length) {
+        const other = [...radios].find(r => r.value === 'Tiêu chí khác');
+        if (other && criterion) other.checked = true;
+        else radios[0].checked = true;
+      }
 
       const preview = document.getElementById('activityImagePreview');
       if (preview) {
@@ -238,9 +265,15 @@ const ActivityCRUD = {
     const id = document.getElementById('activityId').value;
     const startDate = form.startDate.value;
     const endDate = form.endDate.value;
+    const criterion = form.criterion?.value || '';
 
     if (endDate < startDate) {
       Utils.showToast('Ngày kết thúc phải sau ngày bắt đầu', 'danger');
+      return;
+    }
+
+    if (!criterion) {
+      Utils.showToast('Vui lòng chọn tiêu chí SV5T', 'danger');
       return;
     }
 
@@ -250,6 +283,7 @@ const ActivityCRUD = {
       endDate,
       location: form.location.value.trim(),
       description: form.description.value.trim(),
+      criterion,
       report: form.report.value.trim()
     };
 

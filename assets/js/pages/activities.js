@@ -53,6 +53,7 @@ function renderActivityGroup(title, items, status, color) {
                 <div class="card-body d-flex flex-column">
                   <h5 class="card-title">${Utils.escapeHtml(a.name)}</h5>
                   <p class="card-text text-muted small flex-grow-1">${Utils.escapeHtml(a.description || '')}</p>
+                  ${a.criterion ? `<p class="mb-2"><span class="criterion-badge"><i class="bi bi-award me-1"></i>${Utils.escapeHtml(a.criterion)}</span></p>` : ''}
                   <p class="small mb-1"><i class="bi bi-geo-alt me-1"></i>${Utils.escapeHtml(a.location || 'Chưa cập nhật')}</p>
                   <p class="small mb-2"><i class="bi bi-calendar me-1"></i>${Utils.formatDate(a.startDate)} - ${Utils.formatDate(a.endDate)}</p>
                   ${timeInfo}
@@ -185,6 +186,10 @@ Pages.activityDetail = async function(container, id) {
 
           <h5>Mô tả</h5>
           <p>${Utils.escapeHtml(activity.description || 'Chưa có mô tả')}</p>
+
+          ${activity.criterion ? `
+            <p class="mb-3"><span class="criterion-badge criterion-badge-lg"><i class="bi bi-award me-1"></i>Tiêu chí: ${Utils.escapeHtml(activity.criterion)}</span></p>
+          ` : ''}
 
           ${activity.report ? `
             <h5 class="mt-4">Báo cáo</h5>

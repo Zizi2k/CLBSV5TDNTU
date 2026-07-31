@@ -806,6 +806,36 @@ body.layout-dashboard #appContent { min-height: 100vh; padding: 0; }
 }
 .stat-card .stat-label { color: var(--gray-500); font-size: 0.9rem; }
 
+/* Activity criterion */
+.criterion-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.35rem 1rem;
+  padding: 0.75rem 1rem;
+  background: #F8FAFC;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+}
+.criterion-options .form-check {
+  margin: 0;
+  padding-left: 1.6rem;
+}
+.criterion-badge {
+  display: inline-flex;
+  align-items: center;
+  background: #EFF6FF;
+  color: var(--primary-dark);
+  border: 1px solid #BFDBFE;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.criterion-badge-lg {
+  font-size: 0.9rem;
+  padding: 0.35rem 0.85rem;
+}
+
 /* Loading */
 .loading-overlay {
   position: fixed;

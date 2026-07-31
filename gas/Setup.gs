@@ -7,14 +7,14 @@
  */
 
 /** Tăng số này mỗi khi thêm cột/sheet mới trong bản cập nhật */
-const DB_SCHEMA_VERSION = '3';
+const DB_SCHEMA_VERSION = '4';
 
 const SHEET_SCHEMA = {
   Users: ['id', 'memberId', 'email', 'mssv', 'password', 'role', 'status', 'name', 'createdAt'],
   Members: ['id', 'userId', 'name', 'mssv', 'school', 'faculty', 'className', 'email', 'phone',
     'birthday', 'address', 'avatar', 'facebook', 'zalo', 'hobbies', 'skills', 'quote', 'reason',
     'bio', 'role', 'cohort', 'status', 'joinDate', 'totalScore', 'titles'],
-  Activities: ['id', 'name', 'description', 'startDate', 'endDate', 'location', 'image', 'report',
+  Activities: ['id', 'name', 'description', 'criterion', 'startDate', 'endDate', 'location', 'image', 'report',
     'checkInCode', 'qrVisible', 'createdBy', 'createdAt'],
   ActivityParticipants: ['id', 'activityId', 'memberId', 'joinedAt'],
   Announcements: ['id', 'title', 'content', 'authorId', 'authorName', 'createdAt', 'pinned', 'important', 'hidden'],
@@ -282,12 +282,14 @@ function seedData(ss) {
 
   appendRowToSheet(ss, 'Activities', {
     id: 'A001', name: 'Mùa hè xanh', description: 'Chương trình tình nguyện mùa hè',
+    criterion: 'Tình nguyện tốt',
     startDate: d(-3), endDate: d(5), location: 'Huyện Cẩm Mỹ', image: '', report: '',
     checkInCode: Utilities.getUuid().replace(/-/g, '').slice(0, 8).toUpperCase(),
     qrVisible: false, createdBy: adminId, createdAt: formatDateTime(now())
   });
   appendRowToSheet(ss, 'Activities', {
     id: 'A002', name: 'Hiến máu nhân đạo', description: 'Ngày hội hiến máu tình nguyện',
+    criterion: 'Tình nguyện tốt',
     startDate: d(3), endDate: d(3), location: 'Trường ĐH Công nghệ', image: '', report: '',
     checkInCode: Utilities.getUuid().replace(/-/g, '').slice(0, 8).toUpperCase(),
     qrVisible: false, createdBy: adminId, createdAt: formatDateTime(now())

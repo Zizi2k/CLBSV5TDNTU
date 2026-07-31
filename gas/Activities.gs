@@ -29,6 +29,7 @@ function sanitizeActivity(a, counts) {
     id: a.id,
     name: a.name,
     description: a.description,
+    criterion: a.criterion || '',
     startDate: formatDate(a.startDate),
     endDate: formatDate(a.endDate),
     location: a.location,
@@ -91,6 +92,7 @@ function addActivity(payload, user) {
     id: id,
     name: payload.name,
     description: payload.description || '',
+    criterion: payload.criterion || '',
     startDate: payload.startDate,
     endDate: payload.endDate,
     location: payload.location || '',
@@ -106,7 +108,7 @@ function addActivity(payload, user) {
 }
 
 function updateActivity(id, payload) {
-  const allowed = ['name', 'description', 'startDate', 'endDate', 'location', 'image', 'report', 'qrVisible'];
+  const allowed = ['name', 'description', 'criterion', 'startDate', 'endDate', 'location', 'image', 'report', 'qrVisible'];
   const updates = {};
   allowed.forEach(f => { if (payload[f] !== undefined) updates[f] = payload[f]; });
   updateRow(SHEET_NAMES.ACTIVITIES, id, updates);

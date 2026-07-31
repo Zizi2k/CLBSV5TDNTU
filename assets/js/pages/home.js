@@ -98,6 +98,7 @@ function renderActivityCard(a, status) {
         <div class="card-body">
           <h5 class="card-title">${Utils.escapeHtml(a.name)}</h5>
           <p class="card-text text-muted small">${Utils.escapeHtml(a.description || '')}</p>
+          ${a.criterion ? `<p class="mb-2"><span class="criterion-badge"><i class="bi bi-award me-1"></i>${Utils.escapeHtml(a.criterion)}</span></p>` : ''}
           <p class="text-primary fw-semibold small mb-2"><i class="bi bi-clock me-1"></i>${timeInfo}</p>
           <div class="d-flex justify-content-between align-items-center">
             <small class="text-muted"><i class="bi bi-people me-1"></i>${a.participants || 0} người</small>
