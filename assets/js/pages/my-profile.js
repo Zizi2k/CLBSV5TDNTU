@@ -25,7 +25,8 @@ Pages.myProfile = async function(container) {
           <i class="bi bi-camera-fill me-1"></i>Đổi ảnh đại diện
         </button>
         <h2 class="mb-1">${Utils.escapeHtml(member.name)}</h2>
-        <p class="lead mb-0">${Utils.escapeHtml(member.role)}</p>
+        <p class="lead mb-1">${Utils.escapeHtml(member.role)}</p>
+        <p class="mb-0 small opacity-75">Quyền hệ thống: ${Utils.escapeHtml(CONFIG.ROLES[user.role] || user.role)}</p>
       </div>
     </div>
 

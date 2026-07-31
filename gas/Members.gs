@@ -27,7 +27,16 @@ function getMember(id) {
   const scores = getSheetData(SHEET_NAMES.SCORES).filter(s => s.memberId === id);
   const totalScore = scores.reduce((sum, s) => sum + Number(s.score || 0), 0);
 
-  return { ...sanitizeMember(member), totalScore };
+  let userRole = 'member';
+  if (member.userId) {
+    const user = getSheetData(SHEET_NAMES.USERS).find(u => u.id === member.userId);
+    if (user && user.role) userRole = user.role;
+  } else {
+    const user = getSheetData(SHEET_NAMES.USERS).find(u => u.memberId === id);
+    if (user && user.role) userRole = user.role;
+  }
+
+  return { ...sanitizeMember(member), totalScore: totalScore, userRole: userRole };
 }
 
 function sanitizeMember(m) {

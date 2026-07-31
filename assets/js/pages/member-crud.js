@@ -123,16 +123,18 @@ const MemberCRUD = {
                     <input type="text" class="form-control" name="titles" placeholder="VD: Thành viên tích cực">
                   </div>
                   <div class="col-md-4">
-                    <label class="form-label">Chức vụ CLB</label>
-                    <input type="text" class="form-control" name="role" placeholder="VD: Thành viên, Ủy viên">
+                    <label class="form-label">Chức vụ CLB (hiển thị)</label>
+                    <input type="text" class="form-control" name="role" placeholder="VD: Chủ nhiệm CLB, Thành viên">
+                    <div class="form-text">Chỉ là chức danh trên hồ sơ, không mở quyền quản lý</div>
                   </div>
                   <div class="col-md-6" id="memberUserRoleGroup">
-                    <label class="form-label">Quyền hệ thống</label>
+                    <label class="form-label">Quyền hệ thống <span class="text-danger">*</span></label>
                     <select class="form-select" name="userRole">
-                      <option value="member">Thành viên</option>
-                      <option value="executive">Ban Chủ nhiệm</option>
-                      <option value="admin">Admin</option>
+                      <option value="member">Thành viên (chỉ xem / tham gia)</option>
+                      <option value="executive">Ban Chủ nhiệm (thêm/sửa/xóa HĐ, duyệt TV...)</option>
+                      <option value="admin">Admin (toàn quyền)</option>
                     </select>
+                    <div class="form-text">Muốn quản lý hoạt động → chọn <strong>Ban Chủ nhiệm</strong></div>
                   </div>
                   <div class="col-md-6" id="memberPasswordGroup">
                     <label class="form-label">Mật khẩu</label>
@@ -258,12 +260,14 @@ const MemberCRUD = {
       document.getElementById('memberId').value = id;
       document.getElementById('memberModalTitle').textContent = 'Sửa thành viên';
       document.getElementById('memberPasswordGroup').classList.add('d-none');
-      document.getElementById('memberUserRoleGroup').classList.add('d-none');
+      document.getElementById('memberUserRoleGroup').classList.remove('d-none');
 
       ['name', 'mssv', 'email', 'phone', 'school', 'faculty', 'className', 'cohort', 'role', 'bio', 'titles'].forEach(field => {
         const el = form.elements[field];
         if (el) el.value = member[field] || '';
       });
+      const userRoleEl = form.elements.userRole;
+      if (userRoleEl) userRoleEl.value = member.userRole || 'member';
       const joinDateEl = form.elements.joinDate;
       if (joinDateEl) joinDateEl.value = Utils.toInputDate(member.joinDate);
 
