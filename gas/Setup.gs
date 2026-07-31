@@ -1,6 +1,10 @@
 /**
  * Khởi tạo & nâng cấp Google Sheets
  *
+ * ⚠️ KHÔNG dán nội dung Utils.gs vào file này.
+ * SHEET_NAMES chỉ được khai báo 1 lần trong Utils.gs (GAS dùng chung global).
+ * Nếu dán trùng → lỗi: Identifier 'SHEET_NAMES' has already been declared
+ *
  * - initializeSheets(): CHỈ chạy LẦN ĐẦU (tạo database mới + dữ liệu mẫu)
  * - upgradeSheets(): Cập nhật schema khi có tính năng mới — GIỮ NGUYÊN dữ liệu cũ
  * - ensureDatabaseSchema(): Tự chạy khi deploy code mới (gọi từ Code.gs)

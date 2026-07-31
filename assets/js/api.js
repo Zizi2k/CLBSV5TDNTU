@@ -21,6 +21,23 @@ const API = {
 
   _inflight: new Map(),
 
+  _parseGasErrorHtml(text) {
+    if (!text || typeof text !== 'string') return '';
+    if (!text.includes('<html') && !text.includes('<!DOCTYPE')) return '';
+    const decoded = text
+      .replace(/&#39;/g, "'")
+      .replace(/&quot;/g, '"')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>');
+    const match = decoded.match(/(SyntaxError|ReferenceError|TypeError|Error):\s*[^<\n]+/i);
+    if (match) return 'Lỗi Apps Script: ' + match[0].trim();
+    if (/Lỗi|Error/i.test(decoded)) {
+      return 'Apps Script đang lỗi (có thể dán trùng code vào Setup.gs). Mở script.google.com → Executions để xem chi tiết.';
+    }
+    return '';
+  },
+
   isDemoMode() {
     return !CONFIG.API_URL || CONFIG.API_URL.includes('YOUR_GOOGLE_APPS_SCRIPT');
   },
@@ -111,7 +128,8 @@ const API = {
       try {
         result = JSON.parse(text);
       } catch {
-        throw new Error('Không thể kết nối API. Kiểm tra URL Google Apps Script và quyền truy cập.');
+        throw new Error(this._parseGasErrorHtml(text) ||
+          'Không thể kết nối API. Kiểm tra URL Google Apps Script và quyền truy cập (Deploy).');
       }
       if (!result.success) {
         if (result.code === 'UNAUTHORIZED' && !skipAuthHandler && action !== 'logout') {
