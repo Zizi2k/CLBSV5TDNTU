@@ -7,7 +7,7 @@
  */
 
 /** Tăng số này mỗi khi thêm cột/sheet mới trong bản cập nhật */
-const DB_SCHEMA_VERSION = '4';
+const DB_SCHEMA_VERSION = '5';
 
 const SHEET_SCHEMA = {
   Users: ['id', 'memberId', 'email', 'mssv', 'password', 'role', 'status', 'name', 'createdAt'],
@@ -30,7 +30,8 @@ const SHEET_SCHEMA = {
 const DEFAULT_SETTINGS = [
   { key: 'club_name', value: 'CLB SV5T DNTU', description: 'Tên CLB' },
   { key: 'contact_email', value: 'clbsv5t.dongnai@gmail.com', description: 'Email liên hệ' },
-  { key: 'club_logo', value: '', description: 'Logo CLB (URL Google Drive)' }
+  { key: 'club_logo', value: '', description: 'Logo CLB (URL Google Drive)' },
+  { key: 'site_url', value: 'https://zizi2k.github.io/CLBSV5TDNTU/', description: 'Link website (dùng trong email thông báo)' }
 ];
 
 /**

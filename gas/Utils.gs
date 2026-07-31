@@ -142,13 +142,78 @@ function cleanupExpiredSessions() {
   });
 }
 
-function safeSendEmail(to, subject, body) {
-  if (!to) return;
+function safeSendEmail(to, subject, body, options) {
+  if (!to && !(options && options.bcc)) return;
   try {
-    MailApp.sendEmail(String(to), subject, body);
+    const opts = options || {};
+    MailApp.sendEmail({
+      to: String(to || opts.bcc.split(',')[0]),
+      bcc: opts.bcc || '',
+      subject: subject,
+      body: body,
+      name: opts.name || 'CLB SV5T DNTU'
+    });
   } catch (e) {
     Logger.log('Email skip (' + subject + '): ' + e.message);
   }
+}
+
+/** Email các tài khoản active — thông báo hoạt động mới */
+function getActiveUserEmails() {
+  const seen = {};
+  const emails = [];
+  getSheetData(SHEET_NAMES.USERS).forEach(u => {
+    if (u.status !== 'active') return;
+    const email = String(u.email || '').trim().toLowerCase();
+    if (!email || seen[email]) return;
+    seen[email] = true;
+    emails.push(email);
+  });
+  return emails;
+}
+
+function notifyNewActivity(activity) {
+  const emails = getActiveUserEmails();
+  if (!emails.length) return { sent: 0 };
+
+  const settings = getSettings();
+  const clubName = settings.club_name || 'CLB SV5T DNTU';
+  const contact = settings.contact_email || emails[0];
+  const siteUrl = (settings.site_url || 'https://zizi2k.github.io/CLBSV5TDNTU/').replace(/\/?$/, '/');
+  const detailUrl = siteUrl + '#activities/' + activity.id;
+
+  const subject = '[' + clubName + '] Hoạt động mới: ' + activity.name;
+  const body =
+    'Xin chào,\n\n' +
+    clubName + ' vừa đăng hoạt động mới:\n\n' +
+    '• Tên: ' + (activity.name || '') + '\n' +
+    (activity.criterion ? '• Tiêu chí: ' + activity.criterion + '\n' : '') +
+    '• Thời gian: ' + formatDate(activity.startDate) + ' - ' + formatDate(activity.endDate) + '\n' +
+    '• Địa điểm: ' + (activity.location || 'Chưa cập nhật') + '\n' +
+    (activity.description ? '• Mô tả: ' + String(activity.description).substring(0, 300) + '\n' : '') +
+    '\nXem chi tiết và đăng ký tham gia:\n' + detailUrl + '\n\n' +
+    'Trân trọng,\n' + clubName;
+
+  let sent = 0;
+  const batchSize = 40;
+  for (let i = 0; i < emails.length; i += batchSize) {
+    const batch = emails.slice(i, i + batchSize);
+    try {
+      MailApp.sendEmail({
+        to: contact,
+        bcc: batch.join(','),
+        subject: subject,
+        body: body,
+        name: clubName
+      });
+      sent += batch.length;
+    } catch (e) {
+      Logger.log('notifyNewActivity batch ' + i + ': ' + e.message);
+    }
+  }
+
+  logAudit('NOTIFY_NEW_ACTIVITY', activity.id + ' -> ' + sent + ' emails', null);
+  return { sent: sent };
 }
 
 function logAudit(action, details, token) {

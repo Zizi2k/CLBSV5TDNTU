@@ -301,7 +301,7 @@ const ActivityCRUD = {
       } else {
         const result = await API.addActivity(data);
         activityId = result.id;
-        Utils.showToast('Đã thêm hoạt động mới', 'success');
+        Utils.showToast(result.message || 'Đã thêm hoạt động mới', 'success');
       }
 
       if (imageFile && activityId) {

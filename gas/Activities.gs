@@ -104,7 +104,29 @@ function addActivity(payload, user) {
     createdAt: formatDateTime(now())
   });
   logAudit('ADD_ACTIVITY', id, null);
-  return { id, message: 'Đã thêm hoạt động' };
+
+  let emailed = 0;
+  try {
+    const result = notifyNewActivity({
+      id: id,
+      name: payload.name,
+      description: payload.description || '',
+      criterion: payload.criterion || '',
+      startDate: payload.startDate,
+      endDate: payload.endDate,
+      location: payload.location || ''
+    });
+    emailed = result && result.sent ? result.sent : 0;
+  } catch (e) {
+    Logger.log('notifyNewActivity: ' + e.message);
+  }
+
+  return {
+    id: id,
+    message: emailed
+      ? 'Đã thêm hoạt động và gửi email thông báo cho ' + emailed + ' thành viên'
+      : 'Đã thêm hoạt động'
+  };
 }
 
 function updateActivity(id, payload) {
