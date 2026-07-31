@@ -1,0 +1,37 @@
+---
+description: Phân quyền CLB SV5T DNTU — Ban Chủ nhiệm quản lý hoạt động
+alwaysApply: true
+---
+
+# Phân quyền hệ thống CLB SV5T DNTU
+
+## Vai trò
+
+| Role | Label | Ghi chú |
+|------|-------|---------|
+| `admin` | Admin | Toàn quyền |
+| `executive` | Ban Chủ nhiệm | Quản lý CLB (trừ cài đặt/audit chỉ admin) |
+| `member` | Thành viên | Xem, đăng ký HĐ, điểm danh, hồ sơ cá nhân |
+| `guest` | Khách | Chỉ xem công khai |
+
+## Ban Chủ nhiệm (`executive`) — hoạt động
+
+**Ban Chủ nhiệm CÓ quyền thêm / sửa / xóa hoạt động.**
+
+- Backend (`gas/Code.gs`): `addActivity`, `updateActivity`, `deleteActivity`, `uploadActivityImage`, `setActivityQrVisible`, `getActivityAttendanceList` → `requireRole(..., ['admin', 'executive'])`
+- Frontend: trang `#manage` (role `admin` + `executive`) dùng `ActivityCRUD` với đủ nút Thêm / Sửa / Xóa
+- Không thu hẹp quyền này về chỉ `admin` trừ khi user yêu cầu rõ
+
+## Các quyền liên quan Ban Chủ nhiệm
+
+- Duyệt / từ chối thành viên chờ
+- Thêm / sửa thông báo, ghim thông báo
+- Cộng điểm hoạt động, điểm danh QR
+- Upload ảnh hoạt động
+
+## Chỉ Admin
+
+- Khóa tài khoản, reset mật khẩu
+- Xóa thông báo (ẩn)
+- Cài đặt CLB / logo, nhật ký audit, cập nhật Ban Chủ nhiệm sheet
+- Trang `#admin` chỉ role `admin`
