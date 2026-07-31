@@ -451,7 +451,7 @@ const DemoData = {
       status: Utils.getActivityStatus(data.startDate, data.endDate)
     };
     DemoData._getActivitiesStore().push(activity);
-    return { id, message: 'Đã thêm hoạt động (demo — không gửi email)' };
+    return { id, message: 'Đã thêm hoạt động' };
   },
 
   updateActivity(data) {

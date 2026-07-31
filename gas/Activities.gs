@@ -104,25 +104,7 @@ function addActivity(payload, user) {
     createdAt: formatDateTime(now())
   });
   logAudit('ADD_ACTIVITY', id, null);
-
-  try {
-    queueNewActivityNotification({
-      id: id,
-      name: payload.name,
-      description: payload.description || '',
-      criterion: payload.criterion || '',
-      startDate: payload.startDate,
-      endDate: payload.endDate,
-      location: payload.location || ''
-    });
-  } catch (e) {
-    Logger.log('queueNewActivityNotification: ' + e.message);
-  }
-
-  return {
-    id: id,
-    message: 'Đã thêm hoạt động. Email thông báo sẽ gửi trong ít phút.'
-  };
+  return { id: id, message: 'Đã thêm hoạt động' };
 }
 
 function updateActivity(id, payload) {
