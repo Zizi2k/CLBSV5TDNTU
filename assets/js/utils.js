@@ -298,6 +298,29 @@ const Utils = {
     });
   },
 
+  /** Nén ảnh JPEG trước khi upload GAS (tránh Failed to fetch / payload quá lớn) */
+  async compressImageToBase64(file, maxWidth = 1280, quality = 0.72) {
+    if (!file || !file.type?.startsWith('image/')) {
+      return this.fileToBase64(file);
+    }
+    try {
+      const bitmap = await createImageBitmap(file);
+      const scale = Math.min(1, maxWidth / Math.max(bitmap.width, bitmap.height));
+      const w = Math.max(1, Math.round(bitmap.width * scale));
+      const h = Math.max(1, Math.round(bitmap.height * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(bitmap, 0, 0, w, h);
+      bitmap.close?.();
+      const dataUrl = canvas.toDataURL('image/jpeg', quality);
+      return dataUrl.split(',')[1];
+    } catch {
+      return this.fileToBase64(file);
+    }
+  },
+
   async pickImageFile(maxMb = 5) {
     return new Promise((resolve) => {
       const input = document.createElement('input');

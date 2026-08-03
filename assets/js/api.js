@@ -33,7 +33,7 @@ const API = {
     const match = decoded.match(/(SyntaxError|ReferenceError|TypeError|Error):\s*[^<\n]+/i);
     if (match) return 'Lỗi Apps Script: ' + match[0].trim();
     if (/Lỗi|Error/i.test(decoded)) {
-      return 'Apps Script đang lỗi (có thể dán trùng code vào Setup.gs). Mở script.google.com → Executions để xem chi tiết.';
+      return 'Máy chủ Apps Script trả lỗi (thường do upload ảnh quá lớn hoặc Deploy chưa cập nhật). Thử lưu không kèm ảnh, hoặc mở script.google.com → Executions.';
     }
     return '';
   },

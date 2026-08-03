@@ -305,11 +305,15 @@ const ActivityCRUD = {
       }
 
       if (imageFile && activityId) {
-        if (imageFile.size > 5 * 1024 * 1024) {
-          Utils.showToast('Ảnh không quá 5MB', 'danger');
+        if (imageFile.size > 8 * 1024 * 1024) {
+          Utils.showToast('Ảnh quá lớn (>8MB). Hoạt động đã lưu — hãy sửa lại và chọn ảnh nhỏ hơn.', 'warning');
         } else {
-          const base64 = await Utils.fileToBase64(imageFile);
-          await API.uploadActivityImage(base64, imageFile.name, activityId);
+          try {
+            const base64 = await Utils.compressImageToBase64(imageFile);
+            await API.uploadActivityImage(base64, (imageFile.name || 'activity').replace(/\.\w+$/, '') + '.jpg', activityId);
+          } catch (uploadErr) {
+            Utils.showToast('Đã lưu hoạt động nhưng upload ảnh thất bại. Thử sửa lại với ảnh nhỏ hơn.', 'warning');
+          }
         }
       }
 
