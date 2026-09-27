@@ -21,9 +21,10 @@ Pages.home = async function(container, params, { signal } = {}) {
   container.innerHTML = `
     <section class="hero-banner">
       <div class="container text-center position-relative">
-        <h1>Chào mừng đến với ${CONFIG.CLUB_NAME}</h1>
-        <p class="lead mt-3">${CONFIG.CLUB_TAGLINE}</p>
-        <div class="mt-4 d-flex gap-3 justify-content-center flex-wrap">
+        <span class="hero-eyebrow"><i class="bi bi-stars me-1"></i> CỘNG ĐỒNG SINH VIÊN 5 TỐT</span>
+        <h1>Những gương mặt tạo nên <em>${CONFIG.CLUB_NAME}</em></h1>
+        <p class="lead mt-3">${CONFIG.CLUB_TAGLINE}. Cùng gặp gỡ những thành viên đang góp sức xây dựng một cộng đồng năng động và gắn kết.</p>
+        <div class="hero-actions mt-4 d-flex gap-3 justify-content-center flex-wrap">
           ${!Auth.isLoggedIn() ? `
             <a href="#login" class="btn btn-warning btn-lg px-4"><i class="bi bi-box-arrow-in-right me-2"></i>Đăng nhập</a>
             <a href="#register" class="btn btn-outline-light btn-lg px-4"><i class="bi bi-person-plus me-2"></i>Đăng ký</a>
