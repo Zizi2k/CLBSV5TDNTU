@@ -446,6 +446,7 @@ const DemoData = {
       startDate: data.startDate,
       endDate: data.endDate,
       location: data.location || '',
+      joinUrl: data.joinUrl || '',
       image: data.image || '',
       report: '',
       participants: 0,
@@ -467,6 +468,7 @@ const DemoData = {
       startDate: data.startDate ?? store[idx].startDate,
       endDate: data.endDate ?? store[idx].endDate,
       location: data.location ?? store[idx].location,
+      joinUrl: data.joinUrl ?? store[idx].joinUrl,
       report: data.report ?? store[idx].report
     };
     updated.status = Utils.getActivityStatus(updated.startDate, updated.endDate);
