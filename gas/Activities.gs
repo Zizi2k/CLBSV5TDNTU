@@ -340,3 +340,50 @@ function uploadAttendanceProof(base64, filename) {
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   return { url: 'https://drive.google.com/uc?id=' + file.getId() };
 }
+
+/** Ghi nhận một lượt xem duy nhất cho mỗi tài khoản đã đăng nhập. */
+function recordActivityView(activityId, user) {
+  if (!getSheetData(SHEET_NAMES.ACTIVITIES).some(a => String(a.id) === String(activityId))) {
+    throw new Error('Không tìm thấy hoạt động');
+  }
+  const userId = String(user.id);
+  const existing = getSheetData('ActivityViews')
+    .some(v => String(v.activityId) === String(activityId) && String(v.userId) === userId);
+  if (!existing) {
+    const lock = LockService.getScriptLock();
+    lock.waitLock(10000);
+    try {
+      const existsAfterLock = getSheetData('ActivityViews')
+        .some(v => String(v.activityId) === String(activityId) && String(v.userId) === userId);
+      if (!existsAfterLock) appendRow('ActivityViews', {
+        id: generateId('AV'),
+        activityId: activityId,
+        userId: userId,
+        viewedAt: formatDateTime(now())
+      });
+    } finally {
+      lock.releaseLock();
+    }
+  }
+  return { recorded: true };
+}
+
+/** Chỉ Admin và BCN được xem danh tính các tài khoản đã mở chi tiết hoạt động. */
+function getActivityViews(activityId) {
+  if (!getSheetData(SHEET_NAMES.ACTIVITIES).some(a => String(a.id) === String(activityId))) {
+    throw new Error('Không tìm thấy hoạt động');
+  }
+  const users = getSheetData(SHEET_NAMES.USERS);
+  return getSheetData('ActivityViews')
+    .filter(v => String(v.activityId) === String(activityId))
+    .map(v => {
+      const user = users.find(u => String(u.id) === String(v.userId));
+      return {
+        name: user ? user.name || '' : 'Tài khoản đã xóa',
+        email: user ? user.email || '' : '',
+        mssv: user ? user.mssv || '' : '',
+        role: user ? user.role || '' : '',
+        viewedAt: v.viewedAt || ''
+      };
+    });
+}
