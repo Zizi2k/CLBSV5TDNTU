@@ -96,6 +96,11 @@ const ActivityCRUD = {
                     <input type="text" class="form-control" name="location" id="activityLocation" placeholder="VD: Khuôn viên trường, Phường Trảng Dài">
                   </div>
                   <div class="col-12">
+                    <label class="form-label" for="activityJoinUrl">Link tham gia hoạt động</label>
+                    <input type="url" class="form-control" name="joinUrl" id="activityJoinUrl" placeholder="https://..." pattern="https?://.+" maxlength="2048">
+                    <p class="form-text mb-0">Dán link đăng ký hoặc trang tham gia; để trống nếu không có.</p>
+                  </div>
+                  <div class="col-12">
                     <label class="form-label">Tiêu chí SV5T <span class="text-danger">*</span></label>
                     <div class="criterion-options" id="activityCriterionGroup">
                       ${(CONFIG.ACTIVITY_CRITERIA || []).map((c, i) => `
@@ -223,6 +228,7 @@ const ActivityCRUD = {
       document.getElementById('activityStartDate').value = (activity.startDate || '').split('T')[0];
       document.getElementById('activityEndDate').value = (activity.endDate || '').split('T')[0];
       document.getElementById('activityLocation').value = activity.location || '';
+      document.getElementById('activityJoinUrl').value = activity.joinUrl || '';
       document.getElementById('activityDescription').value = activity.description || '';
       document.getElementById('activityReport').value = activity.report || '';
       document.getElementById('activityModalTitle').textContent = 'Sửa hoạt động';
@@ -282,6 +288,7 @@ const ActivityCRUD = {
       startDate,
       endDate,
       location: form.location.value.trim(),
+      joinUrl: form.joinUrl.value.trim(),
       description: form.description.value.trim(),
       criterion,
       report: form.report.value.trim()
