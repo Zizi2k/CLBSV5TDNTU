@@ -203,8 +203,8 @@ const MemberCRUD = {
         e.preventDefault();
         if (!confirm('Reset mật khẩu thành viên này?')) return;
         try {
-          await API.resetPassword(resetBtn.dataset.id);
-          Utils.showToast('Đã reset mật khẩu', 'success');
+          const result = await API.resetPassword(resetBtn.dataset.id);
+          Utils.showToast(result.message || 'Đã gửi mật khẩu mới qua email', 'success');
         } catch (err) { /* handled */ }
         return;
       }
