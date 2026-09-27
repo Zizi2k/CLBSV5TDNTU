@@ -56,7 +56,9 @@ Pages.home = async function(container, params, { signal } = {}) {
                 <button type="button" class="hero-carousel-arrow" data-carousel-step="1" aria-label="Xem nhóm thành viên tiếp theo"><i class="bi bi-chevron-right"></i></button>
               </div>
             ` : ''}
-          ` : '<p class="hero-carousel-empty">Hình ảnh thành viên sẽ xuất hiện khi CLB cập nhật hồ sơ.</p>'}
+          ` : Auth.isLoggedIn()
+            ? '<p class="hero-carousel-empty">Hình ảnh thành viên sẽ xuất hiện khi CLB cập nhật hồ sơ.</p>'
+            : '<p class="hero-carousel-empty">Đăng nhập bằng tài khoản thành viên đã được duyệt để xem hình ảnh CLB.</p>'}
         </div>
       </div>
     </section>
@@ -92,15 +94,17 @@ Pages.home = async function(container, params, { signal } = {}) {
         </div>
       </section>
 
-      <section class="mb-5">
-        <h3 class="section-title">Thành viên tiêu biểu</h3>
-        <div class="row g-4">
-          ${featured.map(m => renderMemberCard(m)).join('')}
-        </div>
-        <div class="text-center mt-3">
-          <a href="#members" class="btn btn-outline-primary">Xem tất cả thành viên</a>
-        </div>
-      </section>
+      ${Auth.isLoggedIn() ? `
+        <section class="mb-5">
+          <h3 class="section-title">Thành viên tiêu biểu</h3>
+          <div class="row g-4">
+            ${featured.map(m => renderMemberCard(m)).join('')}
+          </div>
+          <div class="text-center mt-3">
+            <a href="#members" class="btn btn-outline-primary">Xem tất cả thành viên</a>
+          </div>
+        </section>
+      ` : ''}
     </div>
   `;
 
