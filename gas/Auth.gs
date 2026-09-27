@@ -248,15 +248,24 @@ function resetPassword(id) {
   if (!user) throw new Error('Không tìm thấy');
 
   const newPassword = 'sv5t' + Math.random().toString(36).substring(2, 8);
+  if (!user.email || !String(user.email).trim()) {
+    throw new Error('Tài khoản chưa có email. Vui lòng cập nhật email trước khi reset mật khẩu.');
+  }
+
+  try {
+    MailApp.sendEmail(
+      String(user.email).trim(),
+      'Reset mật khẩu CLB SV5T DNTU',
+      'Xin chào ' + (user.name || '') + ',\\n\\nMật khẩu mới của bạn: ' + newPassword +
+      '\\n\\nHãy đăng nhập và đổi mật khẩu sau khi nhận được email.'
+    );
+  } catch (err) {
+    throw new Error('Không gửi được email đặt lại mật khẩu tới ' + user.email +
+      '. Mật khẩu chưa được đổi. Chi tiết: ' + err.message);
+  }
+
   updateRow(SHEET_NAMES.USERS, user.id, { password: hashPassword(newPassword) });
   logAudit('RESET_PASSWORD', id, null);
-
-  safeSendEmail(
-    user.email,
-    'Reset mật khẩu CLB SV5T DNTU',
-    'Mật khẩu mới của bạn: ' + newPassword
-  );
-
-  return { message: 'Đã reset mật khẩu' };
+  return { message: 'Đã gửi mật khẩu mới tới ' + user.email };
 }
 
