@@ -207,6 +207,8 @@ const API = {
   getActivity: (id, options = {}) => API.request('getActivity', { id }, options),
   recordActivityView: (activityId) => API.request('recordActivityView', { activityId }, { silent: true }),
   getActivityViews: (activityId) => API.request('getActivityViews', { activityId }, { silent: true, useCache: false }),
+  getClubSheetLink: () => API.request('getClubSheetLink', {}, { silent: true, useCache: false }),
+  updateClubSheetLink: (url) => API.request('updateClubSheetLink', { url }),
   addActivity: (data) => API.request('addActivity', data),
   updateActivity: (id, data) => API.request('updateActivity', { id, ...data }),
   deleteActivity: (id, options = {}) => API.request('deleteActivity', { id }, options),
