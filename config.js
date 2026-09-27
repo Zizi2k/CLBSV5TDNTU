@@ -3,7 +3,7 @@
  * Thay API_URL bằng URL Web App sau khi deploy Google Apps Script
  */
 const CONFIG = {
-  APP_VERSION: '2.7.4',
+  APP_VERSION: '2.7.5',
   API_URL: 'https://script.google.com/macros/s/AKfycbzp5UpjkbEDl_bK2jrTLyVkvlH_FbEbYl_RMai_sVRmCSHYIltNYkiP7ocD75uI_-8TIQ/exec',
   CLUB_NAME: 'CLB SV5T DNTU',
   CLUB_SHORT: 'CLB SV5T DNTU',
