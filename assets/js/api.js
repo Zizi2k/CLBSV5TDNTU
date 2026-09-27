@@ -194,6 +194,7 @@ const API = {
   // Members
   getMembers: (filters = {}, options = {}) => API.request('getMembers', filters, options),
   getMember: (id, options = {}) => API.request('getMember', { id }, options),
+  getMemberQr: (id) => API.request('getMemberQr', { id }, { useCache: false }),
   addMember: (data) => API.request('addMember', data),
   updateMember: (id, data) => API.request('updateMember', { id, ...data }),
   deleteMember: (id, options = {}) => API.request('deleteMember', { id }, options),
