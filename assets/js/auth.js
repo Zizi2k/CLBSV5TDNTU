@@ -110,7 +110,7 @@ const Auth = {
       `;
     }
 
-    document.querySelectorAll('#navLinks [data-page="members"], .mobile-dock-link[data-page="members"]').forEach(link => {
+    document.querySelectorAll('#navLinks [data-page="members"], #navLinks [data-page="executive-board"], .mobile-dock-link[data-page="members"]').forEach(link => {
       link.classList.toggle('d-none', !user);
     });
 
