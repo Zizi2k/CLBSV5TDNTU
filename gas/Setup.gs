@@ -11,14 +11,14 @@
  */
 
 /** Tăng số này mỗi khi thêm cột/sheet mới trong bản cập nhật */
-const DB_SCHEMA_VERSION = '5';
+const DB_SCHEMA_VERSION = '6';
 
 const SHEET_SCHEMA = {
   Users: ['id', 'memberId', 'email', 'mssv', 'password', 'role', 'status', 'name', 'createdAt'],
   Members: ['id', 'userId', 'name', 'mssv', 'school', 'faculty', 'className', 'email', 'phone',
     'birthday', 'address', 'avatar', 'facebook', 'zalo', 'hobbies', 'skills', 'quote', 'reason',
     'bio', 'role', 'cohort', 'status', 'joinDate', 'totalScore', 'titles'],
-  Activities: ['id', 'name', 'description', 'criterion', 'startDate', 'endDate', 'location', 'image', 'report',
+  Activities: ['id', 'name', 'description', 'criterion', 'startDate', 'endDate', 'location', 'joinUrl', 'image', 'report',
     'checkInCode', 'qrVisible', 'createdBy', 'createdAt'],
   ActivityParticipants: ['id', 'activityId', 'memberId', 'joinedAt'],
   Announcements: ['id', 'title', 'content', 'authorId', 'authorName', 'createdAt', 'pinned', 'important', 'hidden'],
