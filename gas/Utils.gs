@@ -304,7 +304,7 @@ function getHomeData(user) {
     activities: getActivities({}),
     announcements: getAnnouncements({}),
     members: user ? getMembers({}, user) : [],
-    settings: getSettings()
+    settings: (() => { const settings = getSettings(); delete settings.club_sheet_url; return settings; })()
   };
 }
 
