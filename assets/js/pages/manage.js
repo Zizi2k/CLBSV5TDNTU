@@ -12,6 +12,7 @@ Pages.manage = async function(container) {
               <a class="nav-link" href="#" data-tab="activities"><i class="bi bi-calendar-event me-2"></i>Hoạt động</a>
               <a class="nav-link" href="#" data-tab="announcements"><i class="bi bi-megaphone me-2"></i>Thông báo</a>
               <a class="nav-link" href="#" data-tab="scores"><i class="bi bi-trophy me-2"></i>Điểm hoạt động</a>
+              <a class="nav-link" href="#" data-tab="club-sheet"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Sheet quản lý CLB</a>
               <a class="nav-link" href="#" data-tab="attendance"><i class="bi bi-qr-code-scan me-2"></i>Điểm danh QR</a>
             </nav>
           </div>
@@ -41,6 +42,23 @@ Pages.manage = async function(container) {
         content.innerHTML = renderScoresTab();
         bindScoresEvents(content);
         break;
+      case 'club-sheet': {
+        const result = await API.getClubSheetLink().catch(() => ({ url: '' }));
+        content.innerHTML = `<div class="card"><div class="card-header bg-white"><h5 class="mb-0">Link Sheet quản lý CLB</h5></div>
+          <div class="card-body"><form id="manageClubSheetForm">
+            <label class="form-label" for="manageClubSheetUrl">Link Google Sheets</label>
+            <input id="manageClubSheetUrl" class="form-control mb-3" type="url" value="${Utils.escapeHtml(result.url || '')}" placeholder="https://docs.google.com/spreadsheets/d/..." pattern="https://docs[.]google[.]com/spreadsheets/d/.+" maxlength="2048">
+            <button class="btn btn-success" type="submit">Lưu link</button>
+          </form></div></div>`;
+        content.querySelector('#manageClubSheetForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          try {
+            await API.updateClubSheetLink(content.querySelector('#manageClubSheetUrl').value.trim());
+            Utils.showToast('Đã lưu link Sheet quản lý CLB', 'success');
+          } catch (err) { /* API hiển thị lỗi */ }
+        });
+        break;
+      }
       case 'attendance':
         content.innerHTML = renderAttendanceTab();
         bindAttendanceEvents(content);
