@@ -502,7 +502,7 @@ const Utils = {
   },
 
   buildProfileQrUrl(memberId) {
-    return `${this.appBaseUrl()}#profile/${memberId}`;
+    return `${this.appBaseUrl()}#member-card/${encodeURIComponent(memberId)}`;
   },
 
   defaultActivityImage(name) {
