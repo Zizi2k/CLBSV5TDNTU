@@ -45,7 +45,7 @@ function handleRequest(e, method) {
 }
 
 function routeAction(action, payload) {
-  const publicActions = ['login', 'register', 'logout', 'getHomeData', 'getSettings', 'getActivities', 'getActivity', 'getAnnouncements'];
+  const publicActions = ['login', 'register', 'logout', 'getHomeData', 'getSettings', 'getActivities', 'getActivity', 'getAnnouncements', 'getPublicMember'];
 
   if (!publicActions.includes(action)) {
     const user = validateToken(payload.token);
@@ -62,6 +62,7 @@ function routeAction(action, payload) {
     // Members
     getMembers: () => getMembers(payload, payload._user),
     getMember: () => getMember(payload.id, payload._user),
+    getPublicMember: () => getPublicMember(payload.id),
     getMemberQr: () => requireRole(payload._user, ['admin', 'executive']) || getMemberQr(payload.id, payload._user),
     addMember: () => requireRole(payload._user, ['admin', 'executive']) || addMember(payload),
     updateMember: () => requireRole(payload._user, ['admin', 'executive']) || updateMember(payload.id, payload),
