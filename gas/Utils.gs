@@ -336,3 +336,18 @@ function getAuditLog() {
     };
   });
 }
+
+/** Link Sheet quản lý CLB chỉ trả về cho tài khoản đã được duyệt. */
+function getClubSheetLink(user) {
+  requireRole(user, ['admin', 'executive', 'member']);
+  return { url: String(getSettings().club_sheet_url || '') };
+}
+
+function updateClubSheetLink(value) {
+  const url = String(value || '').trim();
+  if (url && !/^https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9_-]+(?:[/?#][^\s]*)?$/i.test(url)) {
+    throw new Error('Vui lòng nhập link Google Sheets hợp lệ');
+  }
+  setSetting('club_sheet_url', url);
+  return { url: url, message: 'Đã lưu link Sheet quản lý CLB' };
+}
