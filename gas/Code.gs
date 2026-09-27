@@ -60,9 +60,9 @@ function routeAction(action, payload) {
     getProfile: () => getProfile(payload._user),
 
     // Members
-    getMembers: () => getMembers(payload),
-    getMember: () => getMember(payload.id),
-    getMemberQr: () => requireRole(payload._user, ['admin', 'executive']) || getMemberQr(payload.id),
+    getMembers: () => getMembers(payload, payload._user),
+    getMember: () => getMember(payload.id, payload._user),
+    getMemberQr: () => requireRole(payload._user, ['admin', 'executive']) || getMemberQr(payload.id, payload._user),
     addMember: () => requireRole(payload._user, ['admin', 'executive']) || addMember(payload),
     updateMember: () => requireRole(payload._user, ['admin', 'executive']) || updateMember(payload.id, payload),
     deleteMember: () => requireRole(payload._user, ['admin', 'executive']) || deleteMember(payload.id),
@@ -80,7 +80,7 @@ function routeAction(action, payload) {
     updateActivity: () => requireRole(payload._user, ['admin', 'executive']) || updateActivity(payload.id, payload),
     deleteActivity: () => requireRole(payload._user, ['admin', 'executive']) || deleteActivity(payload.id),
     joinActivity: () => joinActivity(payload.activityId, payload._user),
-    getActivityParticipants: () => getActivityParticipants(payload.activityId),
+    getActivityParticipants: () => getActivityParticipants(payload.activityId, payload._user),
     getActivityCheckInInfo: () => getActivityCheckInInfo(payload.activityId, payload._user),
     setActivityQrVisible: () => requireRole(payload._user, ['admin', 'executive']) || setActivityQrVisible(payload.activityId, payload.visible, payload._user),
     memberCheckIn: () => memberCheckIn(payload.activityId, payload, payload._user),
@@ -95,7 +95,7 @@ function routeAction(action, payload) {
     togglePinAnnouncement: () => requireRole(payload._user, ['admin', 'executive']) || togglePinAnnouncement(payload.id),
 
     // Executive Board
-    getExecutiveBoard: () => getExecutiveBoard(),
+    getExecutiveBoard: () => getExecutiveBoard(payload._user),
     updateExecutiveBoard: () => requireRole(payload._user, ['admin']) || updateExecutiveBoard(payload),
 
     // Scores
