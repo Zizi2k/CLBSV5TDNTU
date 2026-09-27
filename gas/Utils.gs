@@ -303,7 +303,7 @@ function getHomeData(user) {
   return {
     activities: getActivities({}),
     announcements: getAnnouncements({}),
-    members: user ? getMembers({}) : [],
+    members: user ? getMembers({}, user) : [],
     settings: getSettings()
   };
 }
