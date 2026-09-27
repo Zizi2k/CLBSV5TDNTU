@@ -16,7 +16,7 @@ const API = {
   SILENT_MUTATIONS: new Set([
     'joinActivity', 'memberCheckIn', 'approveMember', 'lockMember', 'resetPassword',
     'deleteMember', 'deleteActivity', 'deleteAnnouncement', 'togglePinAnnouncement',
-    'addScore', 'setActivityQrVisible', 'logout'
+    'addScore', 'setActivityQrVisible', 'recordActivityView', 'logout'
   ]),
 
   _inflight: new Map(),
@@ -205,6 +205,8 @@ const API = {
   // Activities
   getActivities: (filters = {}, options = {}) => API.request('getActivities', filters, options),
   getActivity: (id, options = {}) => API.request('getActivity', { id }, options),
+  recordActivityView: (activityId) => API.request('recordActivityView', { activityId }, { silent: true }),
+  getActivityViews: (activityId) => API.request('getActivityViews', { activityId }, { silent: true, useCache: false }),
   addActivity: (data) => API.request('addActivity', data),
   updateActivity: (id, data) => API.request('updateActivity', { id, ...data }),
   deleteActivity: (id, options = {}) => API.request('deleteActivity', { id }, options),
