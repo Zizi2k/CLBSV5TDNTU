@@ -7,6 +7,7 @@ const PAGE_TITLES = {
   register: 'Đăng ký',
   members: 'Thành viên',
   profile: 'Hồ sơ thành viên',
+  'member-card': 'Giới thiệu thành viên',
   activities: 'Hoạt động',
   checkin: 'Điểm danh',
   announcements: 'Thông báo',
@@ -40,7 +41,7 @@ const Router = {
     const routeParams = { ...params };
 
     if (paramParts.length) {
-      if (routeName === 'profile') routeParams.id = paramParts[0];
+      if (routeName === 'profile' || routeName === 'member-card') routeParams.id = paramParts[0];
       if (routeName === 'activities') routeParams.id = paramParts[0];
       if (routeName === 'checkin' && paramParts.length >= 2) {
         routeParams.activityId = paramParts[0];
