@@ -2,8 +2,18 @@
  * Quản lý thành viên
  */
 
-function getMembers(filters) {
+function isAdminAccountMember(memberId) {
+  return getSheetData(SHEET_NAMES.USERS)
+    .some(u => u.memberId === memberId && u.role === 'admin');
+}
+
+function getMembers(filters, viewer) {
   let members = getSheetData(SHEET_NAMES.MEMBERS).filter(m => m.status === 'active');
+  if (!viewer || viewer.role !== 'admin') {
+    const adminIds = new Set(getSheetData(SHEET_NAMES.USERS)
+      .filter(u => u.role === 'admin').map(u => u.memberId));
+    members = members.filter(m => !adminIds.has(m.id));
+  }
 
   if (filters.school) members = members.filter(m => m.school === filters.school);
   if (filters.faculty) members = members.filter(m => m.faculty === filters.faculty);
@@ -19,10 +29,12 @@ function getMembers(filters) {
   return members.map(sanitizeMember);
 }
 
-function getMember(id) {
+function getMember(id, viewer) {
   const members = getSheetData(SHEET_NAMES.MEMBERS);
   const member = members.find(m => m.id === id);
-  if (!member) throw new Error('Không tìm thấy thành viên');
+  if (!member || (viewer?.role !== 'admin' && isAdminAccountMember(id))) {
+    throw new Error('Không tìm thấy thành viên');
+  }
 
   const scores = getSheetData(SHEET_NAMES.SCORES).filter(s => s.memberId === id);
   const totalScore = scores.reduce((sum, s) => sum + Number(s.score || 0), 0);
@@ -39,10 +51,12 @@ function getMember(id) {
   return { ...sanitizeMember(member), totalScore: totalScore, userRole: userRole };
 }
 
-function getMemberQr(id) {
+function getMemberQr(id, viewer) {
   const member = getSheetData(SHEET_NAMES.MEMBERS)
     .find(m => m.id === id && m.status === 'active');
-  if (!member) throw new Error('Không tìm thấy thành viên đang hoạt động');
+  if (!member || (viewer?.role !== 'admin' && isAdminAccountMember(id))) {
+    throw new Error('Không tìm thấy thành viên đang hoạt động');
+  }
   return { memberId: member.id, name: member.name };
 }
 
@@ -206,8 +220,13 @@ function addScore(payload, user) {
   return { message: 'Đã cộng điểm', total };
 }
 
-function getExecutiveBoard() {
+function getExecutiveBoard(viewer) {
+  const adminIds = viewer?.role === 'admin'
+    ? new Set()
+    : new Set(getSheetData(SHEET_NAMES.USERS)
+      .filter(u => u.role === 'admin').map(u => u.memberId));
   return getSheetData(SHEET_NAMES.EXECUTIVE_BOARD)
+    .filter(e => !adminIds.has(e.memberId))
     .sort((a, b) => Number(a.order) - Number(b.order))
     .map(e => ({
       id: e.id,
