@@ -5,14 +5,21 @@ Pages.register = async function(container) {
   }
 
   container.innerHTML = `
-    <div class="container py-4">
-      <div class="text-center mb-4">
-        <h2>Đăng ký thành viên</h2>
-        <p class="text-muted">Điền đầy đủ thông tin để đăng ký tham gia ${CONFIG.CLUB_SHORT}</p>
-      </div>
-      <form id="registerForm">
-        <div class="row g-4">
-          <div class="col-lg-8 mx-auto">
+    <section class="auth-page" aria-labelledby="registerHeading">
+      <div class="auth-card auth-register">
+        <aside class="auth-side-panel">
+          <div class="auth-side-inner">
+            <span class="auth-side-mark"><i class="bi bi-stars"></i> SINH VIÊN 5 TỐT</span>
+            <h2>Chào mừng trở lại!</h2>
+            <p>Đã là thành viên của CLB? Đăng nhập để tiếp tục hành trình Sinh viên 5 tốt.</p>
+            <a href="#login" data-auth-target="login" class="auth-outline-btn">Đăng nhập <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </aside>
+        <div class="auth-form-panel">
+          <div class="auth-form-inner auth-register-inner">
+            <h1 id="registerHeading">Tạo tài khoản</h1>
+            <p class="auth-subtitle">Điền thông tin để đăng ký tham gia ${CONFIG.CLUB_SHORT}</p>
+            <form id="registerForm">
             <div class="form-section">
               <h5 class="text-primary mb-3"><i class="bi bi-person me-2"></i>Thông tin cá nhân</h5>
               <div class="row g-3">
@@ -122,14 +129,20 @@ Pages.register = async function(container) {
             <button type="submit" class="btn btn-primary btn-lg w-100 py-3">
               <i class="bi bi-send me-2"></i>Gửi đăng ký
             </button>
-            <p class="text-center text-muted mt-3">
-              Đã có tài khoản? <a href="#login">Đăng nhập</a>
+            <p class="text-center text-muted mt-3 auth-mobile-switch">
+              Đã có tài khoản? <a href="#login" data-auth-target="login">Đăng nhập</a>
             </p>
+            </form>
           </div>
         </div>
-      </form>
-    </div>
+      </div>
+    </section>
   `;
+
+  container.querySelectorAll('[data-auth-target]').forEach(link => link.addEventListener('click', e => {
+    e.preventDefault();
+    AuthTransition.go(link.dataset.authTarget);
+  }));
 
   document.getElementById('avatarInput').addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -148,6 +161,7 @@ Pages.register = async function(container) {
     e.preventDefault();
     const form = e.target;
     const data = Object.fromEntries(new FormData(form));
+    const submit = form.querySelector('[type="submit"]');
 
     if (data.password !== data.confirmPassword) {
       Utils.showToast('Mật khẩu xác nhận không khớp', 'danger');
@@ -167,12 +181,13 @@ Pages.register = async function(container) {
     delete data.confirmPassword;
     delete data.avatar;
 
+    submit.disabled = true;
     try {
       await API.register(data);
       Utils.showToast('Đăng ký thành công! Vui lòng chờ phê duyệt.', 'success');
-      Router.go('login');
+      AuthTransition.go('login');
     } catch (err) {
-      // handled
+      submit.disabled = false;
     }
   });
 };
