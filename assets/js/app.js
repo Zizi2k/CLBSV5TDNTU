@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
   Router.register('activities', Pages.activities);
   Router.register('checkin', Pages.checkin);
   Router.register('announcements', Pages.announcements);
-  Router.register('executive-board', Pages.executiveBoard);
+  Router.register('executive-board', Pages.executiveBoard, { auth: true, roles: ['admin', 'executive', 'member'] });
   Router.register('contact', Pages.contact);
   Router.register('my-profile', Pages.myProfile, { auth: true, roles: ['admin', 'executive', 'member'] });
   Router.register('manage', Pages.manage, { auth: true, roles: ['admin', 'executive'] });
