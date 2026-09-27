@@ -147,8 +147,21 @@ const Router = {
   },
 
   updateActiveNav(page) {
-    document.querySelectorAll('#navLinks .nav-link, #authNav .nav-link').forEach(link => {
-      link.classList.toggle('active', link.dataset.page === page);
+    const section = {
+      profile: 'members',
+      checkin: 'activities',
+      register: 'login',
+      'my-profile': 'my-profile'
+    }[page] || page;
+
+    document.querySelectorAll('#navLinks .nav-link, #authNav .nav-link, .mobile-dock-link').forEach(link => {
+      const accountPage = section === 'my-profile' || section === 'admin' || section === 'manage' || section === 'login';
+      const active = link.id === 'mobileAccountLink'
+        ? accountPage
+        : link.dataset.page === section;
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
     });
   },
 
