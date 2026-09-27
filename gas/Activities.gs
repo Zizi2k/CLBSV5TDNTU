@@ -262,7 +262,12 @@ function getActivityAttendanceList(activityId, user) {
     throw new Error('Bạn không có quyền xem danh sách điểm danh');
   }
   const activity = getActivity(activityId);
-  const attendance = getSheetData(SHEET_NAMES.ATTENDANCE).filter(a => a.activityId === activityId);
+  const adminIds = user.role === 'admin'
+    ? new Set()
+    : new Set(getSheetData(SHEET_NAMES.USERS)
+      .filter(u => u.role === 'admin').map(u => u.memberId));
+  const attendance = getSheetData(SHEET_NAMES.ATTENDANCE)
+    .filter(a => a.activityId === activityId && !adminIds.has(a.memberId));
   const members = getSheetData(SHEET_NAMES.MEMBERS);
   const participants = getActivityParticipants(activityId, user);
 
