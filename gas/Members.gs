@@ -249,3 +249,23 @@ function updateExecutiveBoard(payload) {
   logAudit('UPDATE_EXECUTIVE', 'board updated', null);
   return { message: 'Cập nhật Ban Chủ nhiệm thành công' };
 }
+
+/** Dữ liệu giới thiệu công khai khi quét QR, không trả thông tin liên hệ hay cá nhân. */
+function getPublicMember(id) {
+  const member = getSheetData(SHEET_NAMES.MEMBERS)
+    .find(m => String(m.id) === String(id) && m.status === 'active');
+  if (!member || isAdminAccountMember(member.id)) {
+    throw new Error('Không tìm thấy hồ sơ thành viên');
+  }
+  return {
+    id: member.id,
+    name: member.name || '',
+    avatar: member.avatar || '',
+    role: member.role || '',
+    titles: member.titles || '',
+    bio: member.bio || member.reason || '',
+    quote: member.quote || '',
+    hobbies: member.hobbies || '',
+    skills: member.skills || ''
+  };
+}
