@@ -1,6 +1,6 @@
 const Pages = {};
 
-Pages.home = async function(container) {
+Pages.home = async function(container, params, { signal } = {}) {
   const data = await API.getHomeData({ silent: true });
   const activities = data.activities || [];
   const announcements = data.announcements || [];
@@ -13,6 +13,9 @@ Pages.home = async function(container) {
   const ongoing = activities.filter(a => a.status === 'ongoing' || Utils.getActivityStatus(a.startDate, a.endDate) === 'ongoing');
   const upcoming = activities.filter(a => a.status === 'upcoming' || Utils.getActivityStatus(a.startDate, a.endDate) === 'upcoming');
   const featured = members.slice(0, 4);
+  const carouselMembers = members.filter(m => m && m.id && m.name);
+  const memberSlides = [];
+  for (let i = 0; i < carouselMembers.length; i += 3) memberSlides.push(carouselMembers.slice(i, i + 3));
   const latestNews = announcements.slice(0, 3);
 
   container.innerHTML = `
@@ -29,6 +32,32 @@ Pages.home = async function(container) {
             <a href="#my-profile" class="btn btn-outline-light btn-lg px-4"><i class="bi bi-person me-2"></i>Hồ sơ cá nhân</a>
           `}
         </div>
+        <div class="hero-member-carousel" aria-label="Hình ảnh thành viên CLB">
+          ${memberSlides.length ? `
+            <div class="hero-member-stage" id="homeMemberCarousel" aria-live="off">
+              ${memberSlides.map((slide, index) => `
+                <div class="hero-member-slide ${index === 0 ? 'is-active' : ''}" aria-hidden="${index !== 0}">
+                  ${slide.map(m => `
+                    <a class="hero-member-tile" href="#profile/${encodeURIComponent(m.id)}" aria-label="Xem hồ sơ ${Utils.escapeHtml(m.name)}">
+                      <img src="${Utils.avatarUrl(m.avatar, m.name)}" alt="Ảnh thành viên ${Utils.escapeHtml(m.name)}" loading="${index ? 'lazy' : 'eager'}">
+                      <span class="hero-member-caption"><strong>${Utils.escapeHtml(m.name)}</strong><small>${Utils.escapeHtml(m.role || 'Thành viên')}</small></span>
+                    </a>
+                  `).join('')}
+                  ${Array.from({ length: 3 - slide.length }, () => '<div class="hero-member-tile hero-member-empty" aria-hidden="true"><i class="bi bi-person-plus"></i><span>Thành viên CLB</span></div>').join('')}
+                </div>
+              `).join('')}
+            </div>
+            ${memberSlides.length > 1 ? `
+              <div class="hero-carousel-controls">
+                <button type="button" class="hero-carousel-arrow" data-carousel-step="-1" aria-label="Xem nhóm thành viên trước"><i class="bi bi-chevron-left"></i></button>
+                <div class="hero-carousel-dots" aria-label="Chọn nhóm thành viên">
+                  ${memberSlides.map((_, i) => `<button type="button" class="hero-carousel-dot ${i === 0 ? 'is-active' : ''}" data-carousel-index="${i}" aria-label="Nhóm ${i + 1}" aria-current="${i === 0 ? 'true' : 'false'}"></button>`).join('')}
+                </div>
+                <button type="button" class="hero-carousel-arrow" data-carousel-step="1" aria-label="Xem nhóm thành viên tiếp theo"><i class="bi bi-chevron-right"></i></button>
+              </div>
+            ` : ''}
+          ` : '<p class="hero-carousel-empty">Hình ảnh thành viên sẽ xuất hiện khi CLB cập nhật hồ sơ.</p>'}
+        </div>
       </div>
     </section>
 
@@ -43,6 +72,11 @@ Pages.home = async function(container) {
             <div class="col-md-4">
               <div class="card h-100">
                 <div class="card-body">
+                  ${(() => {
+                    const author = members.find(m => m.name === n.author);
+                    const name = n.author || 'Ban Chủ nhiệm';
+                    return `<div class="home-news-author"><img src="${Utils.avatarUrl(author?.avatar, name)}" alt="Avatar ${Utils.escapeHtml(name)}" loading="lazy"><span><strong>${Utils.escapeHtml(name)}</strong><small>Thông báo CLB</small></span></div>`;
+                  })()}
                   ${n.pinned ? '<span class="badge bg-warning text-dark mb-2"><i class="bi bi-pin-angle"></i> Ghim</span>' : ''}
                   ${n.important ? '<span class="badge bg-danger mb-2"><i class="bi bi-exclamation-circle"></i> Quan trọng</span>' : ''}
                   <h5 class="card-title">${Utils.escapeHtml(n.title)}</h5>
@@ -69,6 +103,48 @@ Pages.home = async function(container) {
       </section>
     </div>
   `;
+
+  const carousel = container.querySelector('#homeMemberCarousel');
+  if (carousel && memberSlides.length > 1) {
+    const slides = [...carousel.querySelectorAll('.hero-member-slide')];
+    const dots = [...container.querySelectorAll('.hero-carousel-dot')];
+    const wrapper = carousel.closest('.hero-member-carousel');
+    let current = 0;
+    let timer;
+
+    const show = index => {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('is-active', i === current);
+        slide.setAttribute('aria-hidden', String(i !== current));
+        slide.querySelectorAll('a').forEach(link => { link.tabIndex = i === current ? 0 : -1; });
+      });
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('is-active', i === current);
+        dot.setAttribute('aria-current', String(i === current));
+      });
+    };
+    const stop = () => { clearInterval(timer); timer = null; };
+    const start = () => {
+      stop();
+      if (document.hidden || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      timer = setInterval(() => {
+        if (!carousel.isConnected) { stop(); return; }
+        show(current + 1);
+      }, 5000);
+    };
+    wrapper.querySelectorAll('[data-carousel-step]').forEach(button =>
+      button.addEventListener('click', () => { show(current + Number(button.dataset.carouselStep)); start(); }));
+    dots.forEach(dot => dot.addEventListener('click', () => { show(Number(dot.dataset.carouselIndex)); start(); }));
+    wrapper.addEventListener('mouseenter', stop);
+    wrapper.addEventListener('mouseleave', start);
+    wrapper.addEventListener('focusin', stop);
+    wrapper.addEventListener('focusout', e => { if (!wrapper.contains(e.relatedTarget)) start(); });
+    document.addEventListener('visibilitychange', () => document.hidden ? stop() : start(), { signal });
+    signal?.addEventListener('abort', stop, { once: true });
+    show(0);
+    start();
+  }
 
   const homeActivities = [...ongoing.slice(0, 3), ...upcoming.slice(0, 3)];
   container.querySelectorAll('.activity-cover').forEach(img => {
