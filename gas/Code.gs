@@ -76,6 +76,8 @@ function routeAction(action, payload) {
     // Activities
     getActivities: () => getActivities(payload),
     getActivity: () => getActivity(payload.id),
+    recordActivityView: () => recordActivityView(payload.activityId, payload._user),
+    getActivityViews: () => requireRole(payload._user, ['admin', 'executive']) || getActivityViews(payload.activityId),
     addActivity: () => requireRole(payload._user, ['admin', 'executive']) || addActivity(payload, payload._user),
     updateActivity: () => requireRole(payload._user, ['admin', 'executive']) || updateActivity(payload.id, payload),
     deleteActivity: () => requireRole(payload._user, ['admin', 'executive']) || deleteActivity(payload.id),
