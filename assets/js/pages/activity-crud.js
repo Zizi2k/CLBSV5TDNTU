@@ -24,6 +24,9 @@ const ActivityCRUD = {
                 <i class="bi bi-file-earmark-excel"></i>
               </button>
             ` : ''}
+            <button class="btn btn-sm btn-outline-info btn-activity-views" data-id="${Utils.escapeHtml(a.id)}" title="Tài khoản đã xem">
+              <i class="bi bi-eye"></i> Đã xem
+            </button>
             <button class="btn btn-sm btn-outline-primary btn-edit-activity" data-id="${a.id}" title="Sửa">
               <i class="bi bi-pencil"></i>
             </button>
@@ -62,6 +65,46 @@ const ActivityCRUD = {
         </div>
       </div>
     `;
+  },
+
+  async openViews(id) {
+    let modal = document.getElementById('activityViewsModal');
+    if (!modal) {
+      document.body.insertAdjacentHTML('beforeend', `
+        <div class="modal fade" id="activityViewsModal" tabindex="-1" aria-labelledby="activityViewsTitle" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="activityViewsTitle">Tài khoản đã xem hoạt động</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+              </div>
+              <div class="modal-body" id="activityViewsBody"></div>
+            </div>
+          </div>
+        </div>`);
+      modal = document.getElementById('activityViewsModal');
+    }
+    const body = document.getElementById('activityViewsBody');
+    body.innerHTML = '<p class="text-muted mb-0">Đang tải...</p>';
+    bootstrap.Modal.getOrCreateInstance(modal).show();
+    try {
+      const viewers = await API.getActivityViews(id);
+      body.innerHTML = viewers.length
+        ? `<p class="text-muted">${viewers.length} tài khoản đã xem</p>
+           <div class="table-responsive"><table class="table table-striped align-middle">
+             <thead><tr><th>Họ tên</th><th>MSSV</th><th>Email</th><th>Vai trò</th><th>Thời điểm xem</th></tr></thead>
+             <tbody>${viewers.map(v => `<tr>
+               <td>${Utils.escapeHtml(v.name || '')}</td>
+               <td>${Utils.escapeHtml(v.mssv || '—')}</td>
+               <td>${Utils.escapeHtml(v.email || '—')}</td>
+               <td>${Utils.escapeHtml(v.role || '')}</td>
+               <td>${Utils.escapeHtml(v.viewedAt || '')}</td>
+             </tr>`).join('')}</tbody>
+           </table></div>`
+        : '<p class="text-muted mb-0">Chưa có tài khoản đăng nhập nào xem hoạt động này.</p>';
+    } catch (err) {
+      body.textContent = err.message || 'Không tải được danh sách người xem.';
+    }
   },
 
   ensureModal() {
@@ -169,6 +212,13 @@ const ActivityCRUD = {
       if (e.target.closest('#btnAddActivity')) {
         e.preventDefault();
         this.openAdd();
+        return;
+      }
+
+      const viewsBtn = e.target.closest('.btn-activity-views');
+      if (viewsBtn) {
+        e.preventDefault();
+        this.openViews(viewsBtn.dataset.id);
         return;
       }
 
