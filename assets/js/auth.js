@@ -109,6 +109,15 @@ const Auth = {
         <li class="nav-item"><a class="nav-link btn btn-warning btn-sm text-dark ms-lg-2 px-3" href="#register" data-page="register">Đăng ký</a></li>
       `;
     }
+
+    const mobileAccount = document.getElementById('mobileAccountLink');
+    if (mobileAccount) {
+      mobileAccount.href = user ? '#my-profile' : '#login';
+      mobileAccount.dataset.page = user ? 'my-profile' : 'login';
+      const label = mobileAccount.querySelector('.mobile-dock-label');
+      if (label) label.textContent = user ? 'Cá nhân' : 'Tài khoản';
+      if (typeof Router !== 'undefined' && Router.currentPage) Router.updateActiveNav(Router.currentPage);
+    }
   },
 
   redirectAfterLogin(user) {
