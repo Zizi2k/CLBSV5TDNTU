@@ -14,6 +14,7 @@ const PAGE_TITLES = {
   contact: 'Liên hệ',
   'my-profile': 'Hồ sơ của tôi',
   manage: 'Quản lý CLB',
+  'club-sheet': 'Sheet quản lý CLB',
   admin: 'Quản trị'
 };
 
