@@ -188,7 +188,7 @@ Pages.activityDetail = async function(container, id) {
           </div>
 
           <h5>Mô tả</h5>
-          <p>${Utils.escapeHtml(activity.description || 'Chưa có mô tả')}</p>
+          <p style="white-space: pre-wrap; overflow-wrap: anywhere">${Utils.escapeHtml(activity.description || 'Chưa có mô tả')}</p>
 
           ${activity.criterion ? `
             <p class="mb-3"><span class="criterion-badge criterion-badge-lg"><i class="bi bi-award me-1"></i>Tiêu chí: ${Utils.escapeHtml(activity.criterion)}</span></p>
