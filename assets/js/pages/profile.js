@@ -51,6 +51,18 @@ Pages.profile = async function(container, params) {
             </ul>
           </div>
 
+          ${Auth.isExecutive() ? `
+            <div class="profile-section text-center">
+              <h5><i class="bi bi-qr-code me-2"></i>Mã QR thành viên</h5>
+              <p class="text-muted small">Chỉ Admin và Ban Chủ nhiệm được xem mã QR để hỗ trợ điểm danh.</p>
+              <button type="button" class="btn btn-outline-primary" id="showMemberQr">Xem mã QR</button>
+              <div id="memberQrContent" class="d-none mt-3">
+                <div id="memberQrImage" class="d-flex justify-content-center"></div>
+                <div class="small text-muted mt-2" id="memberQrId"></div>
+              </div>
+            </div>
+          ` : ''}
+
           <div class="profile-section text-center">
             <h5><i class="bi bi-trophy me-2"></i>Điểm hoạt động</h5>
             <div class="display-4 text-primary fw-bold">${member.totalScore || 0}</div>
@@ -62,4 +74,21 @@ Pages.profile = async function(container, params) {
   `;
 
   Utils.bindImageFallback(document.getElementById('publicProfileAvatar'));
+
+  container.querySelector('#showMemberQr')?.addEventListener('click', async e => {
+    const button = e.currentTarget;
+    button.disabled = true;
+    try {
+      const qr = await API.getMemberQr(member.id);
+      const content = container.querySelector('#memberQrContent');
+      const image = container.querySelector('#memberQrImage');
+      await Utils.renderQrCode(image, qr.memberId, 180);
+      container.querySelector('#memberQrId').textContent = 'Mã thành viên: ' + qr.memberId;
+      content.classList.remove('d-none');
+      button.classList.add('d-none');
+    } catch (err) {
+      button.disabled = false;
+      Utils.showToast(err.message || 'Không tải được mã QR', 'danger');
+    }
+  });
 };
