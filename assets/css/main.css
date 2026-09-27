@@ -1448,7 +1448,7 @@ body.layout-dashboard #appContent { min-height: 100vh; padding: 0; }
 }
 .hero-banner .hero-guest-brand p {
   margin: 0;
-  font-family: Georgia, serif;
+  font-family: "Times New Roman", Times, serif;
   font-size: clamp(1.15rem, 2vw, 1.65rem);
   font-weight: 700;
   color: #36765e;
