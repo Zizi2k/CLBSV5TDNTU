@@ -92,6 +92,13 @@ function initSpaNavigation() {
     const href = link.getAttribute('href');
     if (!href || href === '#') return;
 
+    if (link.matches('#navLinks .nav-link, #authNav .nav-link, .mobile-dock-link')) {
+      link.classList.remove('nav-tapped');
+      void link.offsetWidth;
+      link.classList.add('nav-tapped');
+      setTimeout(() => link.classList.remove('nav-tapped'), 400);
+    }
+
     e.preventDefault();
     const target = href.slice(1);
     if (!target) return;
