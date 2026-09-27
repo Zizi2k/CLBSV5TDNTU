@@ -299,11 +299,11 @@ function getSettings() {
 }
 
 /** Gộp dữ liệu trang chủ — 1 request thay vì 3–4 */
-function getHomeData() {
+function getHomeData(user) {
   return {
     activities: getActivities({}),
     announcements: getAnnouncements({}),
-    members: getMembers({}),
+    members: user ? getMembers({}) : [],
     settings: getSettings()
   };
 }
