@@ -139,11 +139,15 @@ function joinActivity(activityId, user) {
   return { message: 'Đã đăng ký tham gia' };
 }
 
-function getActivityParticipants(activityId) {
+function getActivityParticipants(activityId, viewer) {
   const participants = getSheetData(SHEET_NAMES.ACTIVITY_PARTICIPANTS)
     .filter(p => p.activityId === activityId);
   const members = getSheetData(SHEET_NAMES.MEMBERS);
-  return participants.map(p => {
+  const adminIds = viewer?.role === 'admin'
+    ? new Set()
+    : new Set(getSheetData(SHEET_NAMES.USERS)
+      .filter(u => u.role === 'admin').map(u => u.memberId));
+  return participants.filter(p => !adminIds.has(p.memberId)).map(p => {
     const m = members.find(mem => mem.id === p.memberId);
     return {
       memberId: p.memberId,
@@ -260,7 +264,7 @@ function getActivityAttendanceList(activityId, user) {
   const activity = getActivity(activityId);
   const attendance = getSheetData(SHEET_NAMES.ATTENDANCE).filter(a => a.activityId === activityId);
   const members = getSheetData(SHEET_NAMES.MEMBERS);
-  const participants = getActivityParticipants(activityId);
+  const participants = getActivityParticipants(activityId, user);
 
   const rows = attendance.map((a, idx) => {
     const m = members.find(mem => mem.id === a.memberId) || {};
