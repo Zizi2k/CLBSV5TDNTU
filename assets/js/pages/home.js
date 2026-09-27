@@ -59,7 +59,12 @@ Pages.home = async function(container, params, { signal } = {}) {
             ` : ''}
           ` : Auth.isLoggedIn()
             ? '<p class="hero-carousel-empty">Hình ảnh thành viên sẽ xuất hiện khi CLB cập nhật hồ sơ.</p>'
-            : '<p class="hero-carousel-empty">Đăng nhập bằng tài khoản thành viên đã được duyệt để xem hình ảnh CLB.</p>'}
+            : `<div class="hero-guest-brand">
+                <div class="hero-guest-logo-ring">
+                  <img class="club-logo hero-guest-logo" src="${Utils.escapeHtml(Utils.clubLogoUrl((data.settings?.club_logo || '').trim()))}" alt="Logo CLB SV5T DNTU">
+                </div>
+                <p>Sống chuẩn 5 tốt - sáng tương lai</p>
+              </div>`}
         </div>
       </div>
     </section>
@@ -150,6 +155,9 @@ Pages.home = async function(container, params, { signal } = {}) {
     show(0);
     start();
   }
+
+  const guestLogo = container.querySelector('.hero-guest-logo');
+  if (guestLogo) Utils.bindImageFallback(guestLogo);
 
   const homeActivities = [...ongoing.slice(0, 3), ...upcoming.slice(0, 3)];
   container.querySelectorAll('.activity-cover').forEach(img => {
