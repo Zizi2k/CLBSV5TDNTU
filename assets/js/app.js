@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   Router.register('members', Pages.members, { auth: true, roles: ['admin', 'executive', 'member'] });
   Router.register('profile', Pages.profile, { auth: true, roles: ['admin', 'executive', 'member'] });
   Router.register('activities', Pages.activities);
+  Router.register('club-sheet', Pages.clubSheet, { auth: true, roles: ['admin', 'executive', 'member'] });
   Router.register('checkin', Pages.checkin);
   Router.register('announcements', Pages.announcements);
   Router.register('executive-board', Pages.executiveBoard, { auth: true, roles: ['admin', 'executive', 'member'] });
