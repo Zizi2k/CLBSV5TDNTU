@@ -45,7 +45,7 @@ function handleRequest(e, method) {
 }
 
 function routeAction(action, payload) {
-  const publicActions = ['login', 'register', 'logout', 'getHomeData', 'getSettings', 'getMembers', 'getMember', 'getActivities', 'getActivity', 'getAnnouncements', 'getExecutiveBoard'];
+  const publicActions = ['login', 'register', 'logout', 'getHomeData', 'getSettings', 'getActivities', 'getActivity', 'getAnnouncements', 'getExecutiveBoard'];
 
   if (!publicActions.includes(action)) {
     const user = validateToken(payload.token);
@@ -62,6 +62,7 @@ function routeAction(action, payload) {
     // Members
     getMembers: () => getMembers(payload),
     getMember: () => getMember(payload.id),
+    getMemberQr: () => requireRole(payload._user, ['admin', 'executive']) || getMemberQr(payload.id),
     addMember: () => requireRole(payload._user, ['admin', 'executive']) || addMember(payload),
     updateMember: () => requireRole(payload._user, ['admin', 'executive']) || updateMember(payload.id, payload),
     deleteMember: () => requireRole(payload._user, ['admin', 'executive']) || deleteMember(payload.id),
@@ -107,7 +108,7 @@ function routeAction(action, payload) {
     // Admin
     getDashboard: () => requireRole(payload._user, ['admin', 'executive']) || getDashboard(),
     getAuditLog: () => requireRole(payload._user, ['admin']) || getAuditLog(),
-    getHomeData: () => getHomeData(),
+    getHomeData: () => getHomeData(payload.token ? validateToken(payload.token) : null),
     getSettings: () => getSettings(),
     uploadAvatar: () => uploadAvatar(payload.base64, payload.filename, payload._user, payload.memberId),
     uploadClubLogo: () => requireRole(payload._user, ['admin']) || uploadClubLogo(payload.base64, payload.filename, payload._user),
