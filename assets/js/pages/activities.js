@@ -154,6 +154,7 @@ Pages.activityDetail = async function(container, id) {
   const showQr = checkInInfo && checkInInfo.checkInCode && (checkInInfo.canSeeQr || checkInInfo.qrVisible || checkInInfo.isAdmin);
   const alreadyCheckedIn = hasCheckedIn;
   const coverSrc = Utils.activityImageUrl(activity.image, activity.name);
+  const joinUrl = /^https?:\/\/[^\s]+$/i.test(String(activity.joinUrl || '').trim()) ? String(activity.joinUrl).trim() : '';
 
   container.innerHTML = `
     <div class="container py-4">
@@ -219,6 +220,7 @@ Pages.activityDetail = async function(container, id) {
           ` : ''}
 
           <div class="mt-4 d-flex gap-2 flex-wrap">
+            ${joinUrl ? `<a class="btn btn-success" href="${Utils.escapeHtml(joinUrl)}" target="_blank" rel="noopener noreferrer"><i class="bi bi-box-arrow-up-right me-2"></i>Link tham gia hoạt động</a>` : ''}
             ${status !== 'completed' && Auth.isMember() && !isRegistered ? `
               <button class="btn btn-primary" id="btnJoin"><i class="bi bi-person-plus me-2"></i>Tham gia</button>
             ` : ''}
