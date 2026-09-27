@@ -145,6 +145,8 @@ Pages.activityDetail = async function(container, id) {
     return;
   }
 
+  if (Auth.isLoggedIn()) API.recordActivityView(id).catch(() => {});
+
   const status = activity.status || Utils.getActivityStatus(activity.startDate, activity.endDate);
   if (status !== 'ongoing') checkInInfo = null;
 
