@@ -33,6 +33,7 @@ function sanitizeActivity(a, counts) {
     startDate: formatDate(a.startDate),
     endDate: formatDate(a.endDate),
     location: a.location,
+    joinUrl: a.joinUrl || '',
     image: a.image,
     report: a.report,
     checkInCode: a.checkInCode || '',
@@ -85,6 +86,12 @@ function hasCheckedIn(activityId, memberId) {
     .some(a => a.activityId === activityId && a.memberId === memberId);
 }
 
+function validateActivityJoinUrl(value) {
+  const url = String(value || '').trim();
+  if (url && !/^https?:\/\/[^\s]+$/i.test(url)) throw new Error('Link tham gia phải bắt đầu bằng http:// hoặc https://');
+  return url;
+}
+
 function addActivity(payload, user) {
   const id = generateId('A');
   const code = Utilities.getUuid().replace(/-/g, '').slice(0, 8).toUpperCase();
@@ -96,6 +103,7 @@ function addActivity(payload, user) {
     startDate: payload.startDate,
     endDate: payload.endDate,
     location: payload.location || '',
+    joinUrl: validateActivityJoinUrl(payload.joinUrl),
     image: payload.image || '',
     report: '',
     checkInCode: code,
@@ -108,9 +116,10 @@ function addActivity(payload, user) {
 }
 
 function updateActivity(id, payload) {
-  const allowed = ['name', 'description', 'criterion', 'startDate', 'endDate', 'location', 'image', 'report', 'qrVisible'];
+  const allowed = ['name', 'description', 'criterion', 'startDate', 'endDate', 'location', 'joinUrl', 'image', 'report', 'qrVisible'];
   const updates = {};
   allowed.forEach(f => { if (payload[f] !== undefined) updates[f] = payload[f]; });
+  if (updates.joinUrl !== undefined) updates.joinUrl = validateActivityJoinUrl(updates.joinUrl);
   updateRow(SHEET_NAMES.ACTIVITIES, id, updates);
   logAudit('UPDATE_ACTIVITY', id, null);
   return { message: 'Cập nhật thành công' };
