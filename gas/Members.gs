@@ -39,6 +39,13 @@ function getMember(id) {
   return { ...sanitizeMember(member), totalScore: totalScore, userRole: userRole };
 }
 
+function getMemberQr(id) {
+  const member = getSheetData(SHEET_NAMES.MEMBERS)
+    .find(m => m.id === id && m.status === 'active');
+  if (!member) throw new Error('Không tìm thấy thành viên đang hoạt động');
+  return { memberId: member.id, name: member.name };
+}
+
 function sanitizeMember(m) {
   return {
     id: m.id,
