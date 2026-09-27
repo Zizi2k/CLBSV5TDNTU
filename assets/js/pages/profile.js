@@ -54,7 +54,7 @@ Pages.profile = async function(container, params) {
           ${Auth.isExecutive() ? `
             <div class="profile-section text-center">
               <h5><i class="bi bi-qr-code me-2"></i>Mã QR thành viên</h5>
-              <p class="text-muted small">Chỉ Admin và Ban Chủ nhiệm được xem mã QR. Quét mã để mở trang cá nhân của thành viên.</p>
+              <p class="text-muted small">Chỉ Admin và Ban Chủ nhiệm được xem mã QR. Quét mã để mở trang giới thiệu công khai của thành viên.</p>
               <button type="button" class="btn btn-outline-primary" id="showMemberQr">Xem mã QR</button>
               <div id="memberQrContent" class="d-none mt-3">
                 <div id="memberQrImage" class="d-flex justify-content-center"></div>
@@ -83,7 +83,7 @@ Pages.profile = async function(container, params) {
       const content = container.querySelector('#memberQrContent');
       const image = container.querySelector('#memberQrImage');
       await Utils.renderQrCode(image, Utils.buildProfileQrUrl(qr.memberId), 180);
-      container.querySelector('#memberQrId').innerHTML = 'Mã thành viên: ' + Utils.escapeHtml(qr.memberId) + '<br>Quét QR để mở hồ sơ chi tiết (cần đăng nhập thành viên CLB).';
+      container.querySelector('#memberQrId').innerHTML = 'Mã thành viên: ' + Utils.escapeHtml(qr.memberId) + '<br>Quét QR để xem phần giới thiệu công khai, không hiển thị thông tin cá nhân.';
       content.classList.remove('d-none');
       button.classList.add('d-none');
     } catch (err) {
