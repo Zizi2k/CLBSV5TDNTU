@@ -4,7 +4,7 @@
 const API = {
   GET_ACTIONS: new Set([
     'getHomeData', 'getMembers', 'getMember', 'getActivities', 'getActivity',
-    'getAnnouncements', 'getExecutiveBoard', 'getSettings'
+    'getAnnouncements', 'getExecutiveBoard', 'getSettings', 'getPublicMember'
   ]),
 
   CACHEABLE_ACTIONS: new Set([
@@ -194,6 +194,7 @@ const API = {
   // Members
   getMembers: (filters = {}, options = {}) => API.request('getMembers', filters, options),
   getMember: (id, options = {}) => API.request('getMember', { id }, options),
+  getPublicMember: (id, options = {}) => API.request('getPublicMember', { id }, options),
   getMemberQr: (id) => API.request('getMemberQr', { id }, { useCache: false }),
   addMember: (data) => API.request('addMember', data),
   updateMember: (id, data) => API.request('updateMember', { id, ...data }),
@@ -371,6 +372,16 @@ const DemoData = {
       skills: 'MC, Lập trình',
       quote: '', reason: '', bio: m.bio || '',
       joinDate: '2024-09-01', totalScore: 45, titles: 'Thành viên tích cực'
+    };
+  },
+
+  getPublicMember({ id }) {
+    const member = DemoData._getMembersStore().find(m => m.id === id);
+    if (!member || member.userRole === 'admin') throw new Error('Không tìm thấy hồ sơ thành viên');
+    return {
+      id: member.id, name: member.name || '', avatar: member.avatar || '',
+      role: member.role || '', titles: member.titles || '', bio: member.bio || '',
+      quote: member.quote || '', hobbies: member.hobbies || '', skills: member.skills || ''
     };
   },
 
