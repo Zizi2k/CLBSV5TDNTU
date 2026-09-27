@@ -232,6 +232,8 @@ async function renderAdminSettings() {
   let settings = {};
   try { settings = await API.getSettings({ silent: true }); } catch { settings = {}; }
   const logoUrl = Utils.clubLogoUrl(settings.club_logo);
+  let clubSheetUrl = '';
+  try { clubSheetUrl = (await API.getClubSheetLink()).url || ''; } catch { /* chưa cấu hình */ }
   return `
     <div class="admin-panel-card">
       <div class="admin-panel-header">
@@ -251,6 +253,14 @@ async function renderAdminSettings() {
           </div>
         </div>
         <hr>
+        <form id="clubSheetLinkForm" class="mb-4">
+          <label class="form-label fw-semibold" for="clubSheetUrl">Link Sheet quản lý CLB</label>
+          <div class="input-group">
+            <input type="url" class="form-control" id="clubSheetUrl" value="${Utils.escapeHtml(clubSheetUrl)}" placeholder="https://docs.google.com/spreadsheets/d/..." pattern="https://docs[.]google[.]com/spreadsheets/d/.+" maxlength="2048">
+            <button class="btn btn-success" type="submit"><i class="bi bi-check-lg me-1"></i>Lưu link</button>
+          </div>
+          <div class="form-text">Thành viên đã đăng nhập sẽ mở link từ mục Sheet CLB trên thanh điều hướng. Để trống để ẩn nút mở Sheet.</div>
+        </form>
         <div class="small text-muted">
           <strong>Tên CLB:</strong> ${Utils.escapeHtml(settings.club_name || CONFIG.CLUB_NAME)}<br>
           <strong>Email liên hệ:</strong> ${Utils.escapeHtml(settings.contact_email || CONFIG.CONTACT_EMAIL)}
@@ -261,6 +271,13 @@ async function renderAdminSettings() {
 }
 
 function bindAdminSettings() {
+  document.getElementById('clubSheetLinkForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      await API.updateClubSheetLink(document.getElementById('clubSheetUrl').value.trim());
+      Utils.showToast('Đã lưu link Sheet quản lý CLB', 'success');
+    } catch (err) { /* API hiển thị lỗi */ }
+  });
   Utils.bindImageFallback(document.getElementById('adminClubLogoPreview'));
   document.getElementById('btnChangeClubLogo')?.addEventListener('click', async () => {
     try {
