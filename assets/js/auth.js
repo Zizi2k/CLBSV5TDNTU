@@ -110,6 +110,10 @@ const Auth = {
       `;
     }
 
+    document.querySelectorAll('#navLinks [data-page="members"], .mobile-dock-link[data-page="members"]').forEach(link => {
+      link.classList.toggle('d-none', !user);
+    });
+
     const mobileAccount = document.getElementById('mobileAccountLink');
     if (mobileAccount) {
       mobileAccount.href = user ? '#my-profile' : '#login';
